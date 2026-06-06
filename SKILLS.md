@@ -15,11 +15,13 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] `struct` and data modeling
 - [ ] `interface` and dependency boundaries
 - [ ] error handling
+- [x] Go package boundaries
+- [~] responsibility separation
 - [ ] goroutine
 - [ ] channel
 - [ ] `context`
 - [ ] `net/http`
-- [~] Gin
+- [x] Gin
 - [ ] GORM or `sqlc`
 - [ ] PostgreSQL
 - [ ] Redis
@@ -45,7 +47,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## General Backend Required Skills
 
-- [~] HTTP
+- [x] HTTP
 - [~] REST API
 - [ ] SQL
 - [ ] Redis

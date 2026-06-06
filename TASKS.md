@@ -2,62 +2,49 @@
 
 ## Active Task
 
-### T002: Add Basic Project Structure
-
-Objective:
-
-Introduce initial backend package boundaries without adding database or business logic yet.
-
-Learner should implement:
-
-- `internal/config`
-- `internal/handler`
-- `internal/router`
-- `internal/service`
-- `internal/repository`
-- `internal/model`
-- move route setup out of `cmd/server/main.go` only as much as needed
-
-Agent may provide:
-
-- suggested directory structure
-- explanation of Go package boundaries
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement the full package refactor unless explicitly requested
-
-Acceptance Criteria:
-
-- `go run ./cmd/server` still starts the server.
-- `GET /health` still returns HTTP 200.
-- route registration is separated from `main.go` into a small router or handler package.
-- package names are simple and match their directory responsibilities.
-- no database, auth, or task CRUD code is added yet.
-
-Skills Practiced:
-
-- Go `struct`
-- Go package boundaries
-- responsibility separation
-- Gin
-- HTTP
-
-## Upcoming Tasks
-
 ### T003: Add Configuration Management
 
 Objective:
 
 Add environment-based configuration for server and database settings.
 
+Learner should implement:
+
+- a minimal config struct in `internal/config`
+- environment variable reading for server port
+- sensible defaults for local development
+- startup code that uses config instead of hard-coded `:8080`
+
+Agent may provide:
+
+- suggested config fields
+- explanation of environment variables
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement database connection code yet
+- add Docker Compose yet
+
+Acceptance Criteria:
+
+- `go run ./cmd/server` still starts the server.
+- `GET /health` still returns HTTP 200.
+- server port can be configured through an environment variable.
+- local default still works when no environment variable is set.
+- startup errors are handled explicitly.
+- no database, auth, or task CRUD code is added yet.
+
 Skills Practiced:
 
+- Go `struct`
 - configuration management
 - environment variables
 - error handling
+- HTTP
+
+## Upcoming Tasks
 
 ### T004: Add PostgreSQL With Docker Compose
 

@@ -1,18 +1,8 @@
 package main
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
+import "taskapi/internal/router"
 
 func main() {
-	r := gin.Default()
-	r.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-		})
-	})
-
+	r := router.SetupRouter()
 	r.Run(":8080")
 }

@@ -10,13 +10,14 @@ Stage 1: Go Task API
 
 ## Status
 
-T001 completed and verified
+T002 completed and verified
 
 ## Completed
 
 - [x] Created Go project structure
 - [x] Added Gin server
 - [x] Added health check endpoint
+- [x] Added basic internal package boundaries
 - [ ] Connected PostgreSQL
 - [ ] Added task model
 - [ ] Added task CRUD
@@ -35,8 +36,8 @@ None
 
 ## Next Action
 
-Start Task `T002`: add basic project structure and package boundaries.
+Start Task `T003`: add configuration management.
 
 ## Last Updated
 
-2026-06-05
+2026-06-06
