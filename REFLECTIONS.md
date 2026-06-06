@@ -56,3 +56,36 @@ Evidence:
 - `go run ./cmd/server` started the Gin server on `:8080`.
 - `curl -i http://localhost:8080/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
 - Review record: `reviews/2026-06-05-t001-initialize-go-gin-project.md`.
+
+### 2026-06-06: T002 Add Basic Project Structure
+
+Task:
+
+- Refactored the minimal Gin service into basic internal package boundaries.
+- Moved route setup out of `cmd/server/main.go` into `internal/router` and `internal/handler`.
+- Added durable placeholder packages for `config`, `model`, `repository`, and `service` using minimal `doc.go` files.
+
+What went well:
+
+- Kept the task scope narrow and did not add database, auth, or task CRUD early.
+- Used `internal/router.SetupRouter` to keep `main.go` focused on program startup.
+- Renamed the health route function to `RegisterHealthRoutes`, which better matches its responsibility.
+- Responded to review feedback by making empty package-boundary directories trackable and visible to Go tooling.
+
+Weak areas:
+
+- The first T002 review missed that empty directories are not durable Go packages.
+- `r.Run(":8080")` still ignores the returned error; this should be addressed in T003 when configuration is introduced.
+
+Next improvement:
+
+- In T003, practice defining a small config struct and using environment variables without over-expanding into database setup.
+- Handle startup errors explicitly before moving on to database work.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for `cmd/server` and all current `internal` packages.
+- `go run ./cmd/server` started the Gin server on `:8080`.
+- `curl -i http://localhost:8080/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
+- Review record: `reviews/2026-06-06-t002-add-basic-project-structure.md`.

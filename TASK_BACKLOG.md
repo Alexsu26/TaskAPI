@@ -37,7 +37,7 @@ Skills:
 
 ### T002: Add Basic Project Structure
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
