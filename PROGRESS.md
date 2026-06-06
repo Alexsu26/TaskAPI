@@ -10,13 +10,13 @@ Stage 1: Go Task API
 
 ## Status
 
-Not started
+T001 completed and verified
 
 ## Completed
 
-- [ ] Created Go project structure
-- [ ] Added Gin server
-- [ ] Added health check endpoint
+- [x] Created Go project structure
+- [x] Added Gin server
+- [x] Added health check endpoint
 - [ ] Connected PostgreSQL
 - [ ] Added task model
 - [ ] Added task CRUD
@@ -27,7 +27,7 @@ Not started
 - [ ] Added basic tests
 - [ ] Added Dockerfile
 - [ ] Added Docker Compose
-- [ ] Wrote README run instructions
+- [x] Wrote README run instructions
 
 ## Current Blockers
 
@@ -35,9 +35,8 @@ None
 
 ## Next Action
 
-Start Task `T001`: initialize the Go Gin project and add a `/health` endpoint.
+Start Task `T002`: add basic project structure and package boundaries.
 
 ## Last Updated
 
-2026-06-04
-
+2026-06-05

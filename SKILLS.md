@@ -19,7 +19,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] channel
 - [ ] `context`
 - [ ] `net/http`
-- [ ] Gin
+- [~] Gin
 - [ ] GORM or `sqlc`
 - [ ] PostgreSQL
 - [ ] Redis
@@ -45,8 +45,8 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## General Backend Required Skills
 
-- [ ] HTTP
-- [ ] REST API
+- [~] HTTP
+- [~] REST API
 - [ ] SQL
 - [ ] Redis
 - [ ] authentication
@@ -60,7 +60,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] retry handling
 - [ ] rate limiting
 - [ ] database indexes
-- [ ] API documentation
+- [~] API documentation
 
 ## Skill-To-Stage Mapping
 
@@ -136,4 +136,3 @@ At the beginning of each task, identify which skills from this file the task wil
 At the end of each task, update this file only when there is evidence that the learner practiced or demonstrated a skill.
 
 Do not mark a skill as complete just because code exists. Mark it as complete only when the learner can explain the concept and the implementation has been reviewed or verified.
-
