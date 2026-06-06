@@ -22,7 +22,7 @@ This file is the long-term task pool for the full Go + Python backend learning r
 
 ### T001: Initialize Go Gin Project
 
-Status: `[ ]`
+Status: `[x]`
 
 Objective:
 
@@ -37,7 +37,7 @@ Skills:
 
 ### T002: Add Basic Project Structure
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 
@@ -619,4 +619,3 @@ Skills:
 - API documentation
 - architecture explanation
 - project packaging
-

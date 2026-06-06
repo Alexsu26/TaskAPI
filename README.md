@@ -55,3 +55,14 @@ REFLECTIONS.md
 sessions/
 reviews/ if code was reviewed
 ```
+
+## Local Run Command
+start the repo:
+```bash
+go run ./cmd/server
+```
+
+test local health:
+```bash
+curl -i http://localhost:8080/health
+```

@@ -2,55 +2,13 @@
 
 ## Active Task
 
-### T001: Initialize Go Gin Project
-
-Objective:
-
-Create a minimal Go Gin backend service with a health check endpoint.
-
-Learner should implement:
-
-- Go module initialization
-- `cmd/server/main.go`
-- Gin router
-- `/health` endpoint
-- local run command
-
-Agent may provide:
-
-- suggested directory structure
-- explanation of Gin routing
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- write the entire final implementation unless explicitly requested
-
-Acceptance Criteria:
-
-- `go run ./cmd/server` starts the server.
-- `GET /health` returns HTTP 200.
-- The response body includes a simple status field.
-- `README.md` includes the local run command.
-
-Skills Practiced:
-
-- Gin
-- HTTP
-- REST API
-- Go `struct`
-- basic Go project structure
-
-## Upcoming Tasks
-
 ### T002: Add Basic Project Structure
 
 Objective:
 
-Introduce initial backend package boundaries.
+Introduce initial backend package boundaries without adding database or business logic yet.
 
-Expected areas:
+Learner should implement:
 
 - `internal/config`
 - `internal/handler`
@@ -58,15 +16,50 @@ Expected areas:
 - `internal/service`
 - `internal/repository`
 - `internal/model`
+- move route setup out of `cmd/server/main.go` only as much as needed
+
+Agent may provide:
+
+- suggested directory structure
+- explanation of Go package boundaries
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement the full package refactor unless explicitly requested
+
+Acceptance Criteria:
+
+- `go run ./cmd/server` still starts the server.
+- `GET /health` still returns HTTP 200.
+- route registration is separated from `main.go` into a small router or handler package.
+- package names are simple and match their directory responsibilities.
+- no database, auth, or task CRUD code is added yet.
 
 Skills Practiced:
 
+- Go `struct`
 - Go package boundaries
-- `struct`
-- `interface`
 - responsibility separation
+- Gin
+- HTTP
 
-### T003: Add PostgreSQL With Docker Compose
+## Upcoming Tasks
+
+### T003: Add Configuration Management
+
+Objective:
+
+Add environment-based configuration for server and database settings.
+
+Skills Practiced:
+
+- configuration management
+- environment variables
+- error handling
+
+### T004: Add PostgreSQL With Docker Compose
 
 Objective:
 
@@ -86,56 +79,65 @@ Skills Practiced:
 - Docker
 - configuration management
 
-### T004: Add Task CRUD
+### T005: Design User And Task Models
 
 Objective:
 
-Implement task creation, listing, updating, and deletion.
+Define initial user and task models and understand how they map to database tables.
+
+Skills Practiced:
+
+- Go `struct`
+- database modeling
+- SQL schema basics
+
+### T006: Implement Task Creation
+
+Objective:
+
+Implement the API flow for creating a task.
 
 Skills Practiced:
 
 - REST API
-- database modeling
-- GORM or `sqlc`
+- handler/service/repository boundaries
+- database insert
+- validation
+
+### T007: Implement Task List Query
+
+Objective:
+
+Implement task listing with basic pagination.
+
+Skills Practiced:
+
+- REST API
+- SQL query basics
+- pagination
+- response design
+
+### T008: Implement Task Detail, Update, And Delete
+
+Objective:
+
+Implement task detail lookup, update, and deletion.
+
+Skills Practiced:
+
+- REST API
+- SQL update/delete
 - error handling
-- testing basics
+- status code design
 
-### T005: Add User Registration And Login
+### T009: Add Unified Response And Error Handling
 
 Objective:
 
-Implement user registration, password hashing, login, and JWT generation.
+Standardize API responses and application errors.
 
 Skills Practiced:
 
-- authentication
-- JWT
-- password hashing
 - error handling
-- security basics
-
-### T006: Add Auth Middleware
-
-Objective:
-
-Protect task APIs so users can only access their own data.
-
-Skills Practiced:
-
-- middleware
-- JWT validation
-- authorization
-- request context
-
-### T007: Add Tests And Documentation
-
-Objective:
-
-Add basic tests and complete local run documentation.
-
-Skills Practiced:
-
-- testing
-- API documentation
-- Docker
-- README writing
+- HTTP status codes
+- response design
