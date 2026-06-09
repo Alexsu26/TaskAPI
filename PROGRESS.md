@@ -6,11 +6,11 @@ Stage 1: Go Task API
 
 ## Current Substage
 
-1.1 Project initialization and health check API
+1.2 Database setup
 
 ## Status
 
-T002 completed and verified
+T003 completed and verified
 
 ## Completed
 
@@ -18,6 +18,7 @@ T002 completed and verified
 - [x] Added Gin server
 - [x] Added health check endpoint
 - [x] Added basic internal package boundaries
+- [x] Added configuration management
 - [ ] Connected PostgreSQL
 - [ ] Added task model
 - [ ] Added task CRUD
@@ -36,8 +37,8 @@ None
 
 ## Next Action
 
-Start Task `T003`: add configuration management.
+Start Task `T004`: add PostgreSQL with Docker Compose.
 
 ## Last Updated
 
-2026-06-06
+2026-06-09

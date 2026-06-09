@@ -89,3 +89,39 @@ Evidence:
 - `go run ./cmd/server` started the Gin server on `:8080`.
 - `curl -i http://localhost:8080/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
 - Review record: `reviews/2026-06-06-t002-add-basic-project-structure.md`.
+
+### 2026-06-09: T003 Add Configuration Management
+
+Task:
+
+- Added environment-based configuration for server and database settings.
+- Replaced hard-coded `:8080` startup with configuration-driven server port selection.
+- Added explicit startup error handling around configuration loading and Gin startup.
+
+What went well:
+
+- Kept `cmd/server/main.go` focused on startup by moving configuration into `internal/config`.
+- Preserved the existing `internal/router` and `internal/handler` boundaries.
+- Avoided adding database connection, auth, or task CRUD code before the relevant tasks.
+- Responded to review feedback by completing all defined database configuration fields.
+
+Weak areas:
+
+- The first implementation defined database config fields before loading all of them.
+- Config defaults should be chosen deliberately; the next task should align database defaults with the Docker Compose service.
+
+Next improvement:
+
+- In T004, practice connecting PostgreSQL without leaking database setup into handlers.
+- Keep startup failure paths explicit when introducing database initialization.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all current packages.
+- `go run ./cmd/server` started the Gin server on `:8080`.
+- `curl -i http://localhost:8080/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
+- `SERVER_PORT=8090 go run ./cmd/server` started the Gin server on `:8090`.
+- `curl -i http://localhost:8090/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
+- `SERVER_PORT=abc go run ./cmd/server` produced an explicit startup error.
+- Review record: `reviews/2026-06-09-t003-configuration-management.md`.

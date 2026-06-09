@@ -12,9 +12,9 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Go Required Skills
 
-- [ ] `struct` and data modeling
+- [~] `struct` and data modeling
 - [ ] `interface` and dependency boundaries
-- [ ] error handling
+- [~] error handling
 - [x] Go package boundaries
 - [~] responsibility separation
 - [ ] goroutine
@@ -58,6 +58,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] Linux basics
 - [ ] CI/CD basics
 - [ ] service-to-service communication
+- [~] configuration management
 - [ ] timeout handling
 - [ ] retry handling
 - [ ] rate limiting
