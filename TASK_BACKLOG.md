@@ -52,7 +52,7 @@ Skills:
 
 ### T003: Add Configuration Management
 
-Status: `[ ]`
+Status: `[x]`
 
 Objective:
 
@@ -66,7 +66,7 @@ Skills:
 
 ### T004: Add PostgreSQL With Docker Compose
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

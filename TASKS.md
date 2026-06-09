@@ -2,69 +2,52 @@
 
 ## Active Task
 
-### T003: Add Configuration Management
-
-Objective:
-
-Add environment-based configuration for server and database settings.
-
-Learner should implement:
-
-- a minimal config struct in `internal/config`
-- environment variable reading for server port
-- sensible defaults for local development
-- startup code that uses config instead of hard-coded `:8080`
-
-Agent may provide:
-
-- suggested config fields
-- explanation of environment variables
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement database connection code yet
-- add Docker Compose yet
-
-Acceptance Criteria:
-
-- `go run ./cmd/server` still starts the server.
-- `GET /health` still returns HTTP 200.
-- server port can be configured through an environment variable.
-- local default still works when no environment variable is set.
-- startup errors are handled explicitly.
-- no database, auth, or task CRUD code is added yet.
-
-Skills Practiced:
-
-- Go `struct`
-- configuration management
-- environment variables
-- error handling
-- HTTP
-
-## Upcoming Tasks
-
 ### T004: Add PostgreSQL With Docker Compose
 
 Objective:
 
 Run PostgreSQL locally and connect the Go service to it.
 
-Expected areas:
+Learner should implement:
 
-- `docker-compose.yml`
-- database configuration
-- connection initialization
-- health check for database connectivity
+- `docker-compose.yml` with PostgreSQL
+- database configuration usage from `internal/config`
+- connection initialization in a clear package boundary
+- startup code that fails clearly if the database connection cannot be initialized
+- a health-related check or startup evidence that confirms the database connection works
+
+Agent may provide:
+
+- suggested Docker Compose structure
+- explanation of PostgreSQL environment variables
+- database connection package boundary suggestions
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement task CRUD
+- implement user/auth code
+- add migrations yet unless explicitly discussed
+
+Acceptance Criteria:
+
+- `docker compose up` starts PostgreSQL.
+- the Go service can initialize a database connection using configuration values.
+- startup errors for database connection are handled explicitly.
+- `go run ./cmd/server` still starts successfully when PostgreSQL is available.
+- `GET /health` still returns HTTP 200.
+- no auth or task CRUD code is added yet.
 
 Skills Practiced:
 
 - PostgreSQL
-- SQL
-- Docker
-- configuration management
+- SQL basics
+- Docker Compose
+- database connection handling
+- error handling
+
+## Upcoming Tasks
 
 ### T005: Design User And Task Models
 
