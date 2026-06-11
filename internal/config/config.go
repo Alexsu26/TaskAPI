@@ -27,9 +27,9 @@ func Load() (Config, error) {
 		Database: DatabaseConfig{
 			Host:     envOrDefault("DATABASE_HOST", "localhost"),
 			Port:     envOrDefault("DATABASE_PORT", "5432"),
-			User:     envOrDefault("DATABASE_USER", "root"),
-			Password: envOrDefault("DATABASE_PASSWORD", ""),
-			Name:     envOrDefault("DATABASE_NAME", ""),
+			User:     envOrDefault("DATABASE_USER", "taskapi"),
+			Password: envOrDefault("DATABASE_PASSWORD", "taskapi"),
+			Name:     envOrDefault("DATABASE_NAME", "taskapi"),
 		},
 	}
 

@@ -66,7 +66,7 @@ Skills:
 
 ### T004: Add PostgreSQL With Docker Compose
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -81,7 +81,7 @@ Skills:
 
 ### T005: Design User And Task Models
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

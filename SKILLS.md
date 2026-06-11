@@ -23,10 +23,10 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] `net/http`
 - [x] Gin
 - [ ] GORM or `sqlc`
-- [ ] PostgreSQL
+- [~] PostgreSQL
 - [ ] Redis
 - [ ] JWT
-- [ ] Docker
+- [~] Docker
 - [ ] testing
 - [ ] logging
 - [ ] middleware
@@ -49,12 +49,12 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 - [x] HTTP
 - [~] REST API
-- [ ] SQL
+- [~] SQL
 - [ ] Redis
 - [ ] authentication
 - [ ] logging
 - [ ] testing
-- [ ] Docker
+- [~] Docker
 - [ ] Linux basics
 - [ ] CI/CD basics
 - [ ] service-to-service communication

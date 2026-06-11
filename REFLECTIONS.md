@@ -125,3 +125,40 @@ Evidence:
 - `curl -i http://localhost:8090/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
 - `SERVER_PORT=abc go run ./cmd/server` produced an explicit startup error.
 - Review record: `reviews/2026-06-09-t003-configuration-management.md`.
+
+### 2026-06-11: T004 Add PostgreSQL With Docker Compose
+
+Task:
+
+- Added PostgreSQL through Docker Compose and connected the Go service to it during startup.
+- Added a database package boundary using `database/sql` and pgx.
+- Kept the existing Gin router and `/health` endpoint behavior unchanged.
+
+What went well:
+
+- Chose Compose database credentials that match the application configuration defaults.
+- Kept database initialization in `internal/database` instead of mixing it into handlers.
+- Wrapped startup failures clearly through `init postgres db` and `ping postgres db`.
+- Stayed within T004 scope and did not add task CRUD, auth, or migrations early.
+
+Weak areas:
+
+- The initialized `*sql.DB` is currently not retained or closed by the application. This is acceptable for T004 startup validation, but future repository work needs an explicit ownership pattern for the database handle.
+- There is no health endpoint database check yet. For this task, startup `Ping` evidence is enough, but later health design should distinguish service liveness from database readiness.
+
+Next improvement:
+
+- In T005, focus on simple model fields that map cleanly to SQL tables without starting CRUD implementation early.
+- Before T006, decide how the database handle should be passed into repositories.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all current packages.
+- `docker compose config` parsed successfully.
+- `docker compose up -d` started the PostgreSQL container.
+- `docker compose exec -T postgres pg_isready -U taskapi -d taskapi` reported accepting connections.
+- `go run ./cmd/server` started the Gin server on `:8080` while PostgreSQL was available.
+- `curl -i http://localhost:8080/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
+- `DATABASE_PORT=15432 go run ./cmd/server` produced an explicit database startup failure.
+- Review record: `reviews/2026-06-11-t004-postgresql-docker-compose.md`.
