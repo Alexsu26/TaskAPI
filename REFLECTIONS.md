@@ -162,3 +162,34 @@ Evidence:
 - `curl -i http://localhost:8080/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
 - `DATABASE_PORT=15432 go run ./cmd/server` produced an explicit database startup failure.
 - Review record: `reviews/2026-06-11-t004-postgresql-docker-compose.md`.
+
+### 2026-06-11: T005 Design User And Task Models
+
+Task:
+
+- Added initial `User` and `Task` model structs under `internal/model`.
+- Designed fields for upcoming user registration and task CRUD work.
+- Kept the implementation limited to models without adding handlers, services, repositories, migrations, auth, or CRUD code.
+
+What went well:
+
+- Used the existing `internal/model` package boundary correctly.
+- Included core model fields such as IDs, timestamps, `Email`, `PasswordHash`, task ownership, title, description, and status.
+- Corrected `Task.UserID` to match the `User.ID` type, making the future SQL foreign key relationship clearer.
+- Added `User.Name`, which is reasonable for future registration and display needs.
+
+Weak areas:
+
+- The first pass used different types for `User.ID` and `Task.UserID`, which would have made future SQL relationships awkward.
+- Status is currently a free-form string; later tasks should constrain allowed values through validation or constants.
+
+Next improvement:
+
+- In T006, implement task creation while keeping handler, service, and repository responsibilities separate.
+- Decide how the application should retain and pass the existing `*sql.DB` handle into repository code.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all current packages.
+- Review record: `reviews/2026-06-11-t005-design-user-and-task-models.md`.

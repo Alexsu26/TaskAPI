@@ -81,7 +81,7 @@ Skills:
 
 ### T005: Design User And Task Models
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -95,7 +95,7 @@ Skills:
 
 ### T006: Implement Task Creation
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

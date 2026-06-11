@@ -12,7 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Go Required Skills
 
-- [~] `struct` and data modeling
+- [x] `struct` and data modeling
 - [ ] `interface` and dependency boundaries
 - [~] error handling
 - [x] Go package boundaries

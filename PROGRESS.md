@@ -6,11 +6,11 @@ Stage 1: Go Task API
 
 ## Current Substage
 
-1.2 Database setup
+1.3 Task CRUD
 
 ## Status
 
-T004 completed and verified
+T005 completed and verified
 
 ## Completed
 
@@ -20,7 +20,8 @@ T004 completed and verified
 - [x] Added basic internal package boundaries
 - [x] Added configuration management
 - [x] Connected PostgreSQL
-- [ ] Added task model
+- [x] Added task model
+- [x] Added user model
 - [ ] Added task CRUD
 - [ ] Added user registration
 - [ ] Added password hashing
@@ -37,7 +38,7 @@ None
 
 ## Next Action
 
-Start Task `T005`: design initial user and task models.
+Start Task `T006`: implement task creation.
 
 ## Last Updated
 
