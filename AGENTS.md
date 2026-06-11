@@ -114,3 +114,95 @@ After each completed task:
 5. Add or update an entry in `REFLECTIONS.md`.
 6. Add a session record under `sessions/`.
 7. Add a review record under `reviews/` if code was reviewed.
+
+## Commit Task Command Workflow
+
+When the learner says `commit taskxxx`, treat it as a publish command for the current completed task.
+
+Required workflow:
+
+1. Verify the current working tree and branch:
+
+```bash
+git status --short --branch
+```
+
+2. Create a new branch for the current workspace changes.
+
+Branch naming rule:
+
+```text
+taskxxx-yyyy
+```
+
+- `taskxxx` comes from the learner command, such as `task4`, `task004`, or `t004`.
+- `yyyy` is a short kebab-case English summary of the task.
+- Prefer lowercase branch names with no spaces, underscores, or uppercase letters.
+- Follow existing branch style when possible, for example:
+  - `task1-gin-health`
+  - `task2-basic-project-structure`
+  - `task3-configuration-management`
+
+3. Before committing, run the task-relevant verification commands unless they were already run in the current review session.
+
+4. Commit all current workspace changes for this task with a Conventional Commit message.
+
+Example:
+
+```bash
+git add .
+git commit -m "feat: add postgresql docker compose setup"
+```
+
+5. Push the new branch to remote:
+
+```bash
+git push -u origin <branch-name>
+```
+
+6. Create a GitHub PR / MR against `main` using GitHub CLI when available:
+
+```bash
+gh pr create --base main --head <branch-name> --title "<title>" --body "<summary>"
+```
+
+7. After the PR / MR is created, use GitHub CLI to approve it:
+
+```bash
+gh pr review <pr-number-or-url> --approve
+```
+
+If GitHub rejects the approval, for example because the PR was created by the same account, do not pretend it was approved. Report the exact failure and continue with the remaining publish workflow.
+
+8. After the PR / MR creation and approval attempt, sync the local `main` branch with `origin/main` using a fast-forward-only flow:
+
+```bash
+git fetch origin main
+git switch main
+git pull --ff-only origin main
+```
+
+Then verify local `main` matches `origin/main`:
+
+```bash
+git rev-parse HEAD
+git rev-parse origin/main
+```
+
+9. If `gh` is unavailable or authentication fails, do not pretend the MR was created or approved. Provide the pushed branch name and the manual PR creation URL instead.
+
+10. After the push, MR creation, approval attempt, and `main` sync, report:
+
+- branch name
+- commit hash
+- push result
+- PR/MR URL, or manual PR URL if automatic creation failed
+- approval result
+- local `main` sync result
+
+Rules:
+
+- Do not create an empty commit if there are no workspace changes.
+- Do not merge the branch into `main`.
+- Do not run `git reset --hard` or discard learner changes.
+- If unrelated changes are present, report them before committing and ask whether they should be included.
