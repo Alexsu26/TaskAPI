@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"taskapi/internal/config"
+	"taskapi/internal/database"
 	"taskapi/internal/router"
 )
 
@@ -17,6 +18,10 @@ func run() error {
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)
+	}
+	_, err = database.NewPostgresDB(&cfg)
+	if err != nil {
+		return fmt.Errorf("init postgres db: %w", err)
 	}
 
 	r := router.SetupRouter()

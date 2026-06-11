@@ -10,7 +10,7 @@ Stage 1: Go Task API
 
 ## Status
 
-T003 completed and verified
+T004 completed and verified
 
 ## Completed
 
@@ -19,7 +19,7 @@ T003 completed and verified
 - [x] Added health check endpoint
 - [x] Added basic internal package boundaries
 - [x] Added configuration management
-- [ ] Connected PostgreSQL
+- [x] Connected PostgreSQL
 - [ ] Added task model
 - [ ] Added task CRUD
 - [ ] Added user registration
@@ -28,7 +28,7 @@ T003 completed and verified
 - [ ] Added JWT middleware
 - [ ] Added basic tests
 - [ ] Added Dockerfile
-- [ ] Added Docker Compose
+- [x] Added Docker Compose
 - [x] Wrote README run instructions
 
 ## Current Blockers
@@ -37,8 +37,8 @@ None
 
 ## Next Action
 
-Start Task `T004`: add PostgreSQL with Docker Compose.
+Start Task `T005`: design initial user and task models.
 
 ## Last Updated
 
-2026-06-09
+2026-06-11
