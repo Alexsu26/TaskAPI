@@ -12,51 +12,17 @@ Summary:
 - Reused `internal/config` database values for connection setup.
 - Preserved the existing Gin `/health` endpoint.
 
-## Active Task
-
 ### T005: Design User And Task Models
+Status: Completed and verified on 2026-06-11.
 
-Objective:
+Summary:
 
-Define initial user and task models and understand how they map to database tables.
+- Added initial `User` and `Task` structs under `internal/model`.
+- Included fields needed for upcoming user registration and task CRUD.
+- Aligned `Task.UserID` with `User.ID` so the models map cleanly to future SQL table relationships.
+- Preserved existing Gin router and handler behavior without adding CRUD, auth, repository, service, or migration code.
 
-Learner should implement:
-
-- Go structs for initial user and task models
-- field choices that map clearly to future PostgreSQL tables
-- basic comments or notes explaining key fields when useful
-- no repository, handler, auth, or CRUD implementation yet
-
-Agent may provide:
-
-- model boundary suggestions
-- SQL table design explanation
-- examples of field naming and timestamp choices
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement model code wholesale unless explicitly requested
-- implement database migrations yet
-- implement task CRUD or authentication flows
-
-Acceptance Criteria:
-
-- user and task model structs exist in the appropriate package.
-- model fields are enough for upcoming registration and task CRUD work.
-- field names and types are understandable and consistent.
-- the design can be mapped to SQL tables.
-- `go test ./...` still passes.
-- no handler, service, repository, auth, or CRUD code is added yet.
-
-Skills Practiced:
-
-- Go `struct`
-- database modeling
-- SQL schema basics
-
-## Upcoming Tasks
+## Active Task
 
 ### T006: Implement Task Creation
 
@@ -64,12 +30,50 @@ Objective:
 
 Implement the API flow for creating a task.
 
+Learner should implement:
+
+- request shape for creating a task
+- handler entrypoint for task creation
+- service/repository boundary needed for task creation
+- database insert for a new task
+- basic input validation for required fields
+- clear error behavior for invalid input and database failures
+
+Agent may provide:
+
+- route and package boundary suggestions
+- request/response contract review
+- repository interface examples
+- SQL insert explanation
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement the full handler/service/repository flow unless explicitly requested
+- implement list/detail/update/delete endpoints yet
+- implement authentication or current-user ownership yet
+
+Acceptance Criteria:
+
+- `POST /tasks` route exists.
+- request body includes at least a task title and optional description.
+- invalid input returns a clear client error.
+- valid input inserts a task into PostgreSQL.
+- successful creation returns the created task or its key fields.
+- code follows handler/service/repository package boundaries.
+- `go test ./...` still passes.
+- existing `/health` endpoint still works.
+- list/detail/update/delete and authentication remain out of scope.
+
 Skills Practiced:
 
 - REST API
 - handler/service/repository boundaries
 - database insert
 - validation
+
+## Upcoming Tasks
 
 ### T007: Implement Task List Query
 
