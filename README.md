@@ -57,6 +57,11 @@ reviews/ if code was reviewed
 ```
 
 ## Local Run Command
+init the PG:
+```bash
+docker compose up -d
+```
+
 start the repo:
 ```bash
 go run ./cmd/server
@@ -66,3 +71,9 @@ test local health:
 ```bash
 curl -i http://localhost:8080/health
 ```
+
+after servering, use
+```bash
+docker compose down
+```
+to shutdown the PG

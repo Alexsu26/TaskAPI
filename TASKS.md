@@ -22,58 +22,19 @@ Summary:
 - Aligned `Task.UserID` with `User.ID` so the models map cleanly to future SQL table relationships.
 - Preserved existing Gin router and handler behavior without adding CRUD, auth, repository, service, or migration code.
 
-## Active Task
-
 ### T006: Implement Task Creation
+Status: Completed and verified on 2026-06-13.
 
-Objective:
+Summary:
 
-Implement the API flow for creating a task.
+- Added `POST /tasks` for creating a task.
+- Wired task creation through handler, service, and repository boundaries.
+- Added PostgreSQL table creation and a temporary dev user for pre-auth task ownership.
+- Inserted tasks with `INSERT ... RETURNING` so the response includes database-generated fields.
+- Added validation for missing and whitespace-only titles.
+- Preserved `/health` and kept list/detail/update/delete/auth out of scope.
 
-Learner should implement:
-
-- request shape for creating a task
-- handler entrypoint for task creation
-- service/repository boundary needed for task creation
-- database insert for a new task
-- basic input validation for required fields
-- clear error behavior for invalid input and database failures
-
-Agent may provide:
-
-- route and package boundary suggestions
-- request/response contract review
-- repository interface examples
-- SQL insert explanation
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement the full handler/service/repository flow unless explicitly requested
-- implement list/detail/update/delete endpoints yet
-- implement authentication or current-user ownership yet
-
-Acceptance Criteria:
-
-- `POST /tasks` route exists.
-- request body includes at least a task title and optional description.
-- invalid input returns a clear client error.
-- valid input inserts a task into PostgreSQL.
-- successful creation returns the created task or its key fields.
-- code follows handler/service/repository package boundaries.
-- `go test ./...` still passes.
-- existing `/health` endpoint still works.
-- list/detail/update/delete and authentication remain out of scope.
-
-Skills Practiced:
-
-- REST API
-- handler/service/repository boundaries
-- database insert
-- validation
-
-## Upcoming Tasks
+## Active Task
 
 ### T007: Implement Task List Query
 
@@ -81,12 +42,52 @@ Objective:
 
 Implement task listing with basic pagination.
 
+Learner should implement:
+
+- request query parameters for pagination
+- handler entrypoint for listing tasks
+- service/repository boundary needed for list query
+- database query for fetching tasks
+- stable ordering for list results
+- clear behavior for invalid pagination input
+
+Agent may provide:
+
+- route and package boundary suggestions
+- request/query contract review
+- repository query examples
+- SQL `SELECT`, `LIMIT`, and `OFFSET` explanation
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement the full handler/service/repository flow unless explicitly requested
+- implement detail/update/delete endpoints yet
+- implement authentication or current-user ownership yet
+
+Acceptance Criteria:
+
+- `GET /tasks` route exists.
+- query supports basic pagination, such as `limit` and `offset` or `page` and `page_size`.
+- invalid pagination input returns a clear client error.
+- valid request reads tasks from PostgreSQL.
+- results are returned in a stable order.
+- code follows handler/service/repository package boundaries.
+- `go test ./...` still passes.
+- existing `/health` endpoint still works.
+- detail/update/delete and authentication remain out of scope.
+
 Skills Practiced:
 
 - REST API
+- handler/service/repository boundaries
 - SQL query basics
 - pagination
 - response design
+- validation
+
+## Upcoming Tasks
 
 ### T008: Implement Task Detail, Update, And Delete
 

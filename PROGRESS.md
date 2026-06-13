@@ -10,7 +10,7 @@ Stage 1: Go Task API
 
 ## Status
 
-T005 completed and verified
+T006 completed and verified
 
 ## Completed
 
@@ -22,6 +22,7 @@ T005 completed and verified
 - [x] Connected PostgreSQL
 - [x] Added task model
 - [x] Added user model
+- [x] Added task creation endpoint
 - [ ] Added task CRUD
 - [ ] Added user registration
 - [ ] Added password hashing
@@ -38,8 +39,8 @@ None
 
 ## Next Action
 
-Start Task `T006`: implement task creation.
+Start Task `T007`: implement task list query.
 
 ## Last Updated
 
-2026-06-11
+2026-06-13

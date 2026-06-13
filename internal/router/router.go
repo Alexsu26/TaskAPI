@@ -6,10 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
+func SetupRouter(h *handler.Handler) *gin.Engine {
 	r := gin.Default()
 
-	handler.RegisterHealthRoutes(r)
+	h.RegisterHealthRoutes(r)
+	h.RegisterTaskCreateRoutes(r)
 
 	return r
 }
