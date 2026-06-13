@@ -193,3 +193,42 @@ Evidence:
 - `gofmt -l cmd/server internal` produced no output.
 - `go test ./...` passed for all current packages.
 - Review record: `reviews/2026-06-11-t005-design-user-and-task-models.md`.
+
+### 2026-06-13: T006 Implement Task Creation
+
+Task:
+
+- Implemented and reviewed `POST /tasks` for task creation.
+- Wired request handling through handler, service, and repository boundaries.
+- Added PostgreSQL table setup and a temporary dev user strategy for pre-auth task ownership.
+
+What went well:
+
+- Preserved the existing `/health` endpoint while adding the create route.
+- Passed the `*sql.DB` dependency from startup into repository code instead of using globals.
+- Used Gin JSON binding for request parsing and separated validation errors from internal/database errors.
+- Used `INSERT ... RETURNING` so the API response includes database-generated fields.
+- Kept list/detail/update/delete and authentication out of scope.
+
+Weak areas:
+
+- Initial handler code had syntax and control-flow issues around `if err` and missing `return`.
+- The relationship between `Exec`, `QueryRow`, and PostgreSQL `RETURNING` needed explanation.
+- Pre-auth ownership required an explicit temporary strategy to avoid foreign-key failures.
+
+Next improvement:
+
+- In T007, focus on SQL read queries, stable ordering, and pagination input validation.
+- Continue checking handler control flow carefully after every `ctx.JSON` error response.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all current packages.
+- `docker compose up -d` started the PostgreSQL container.
+- `go run ./cmd/server` started the Gin server on `:8080`.
+- `curl -i http://localhost:8080/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
+- `POST /tasks` without `title` returned `HTTP/1.1 400 Bad Request`.
+- `POST /tasks` with whitespace-only `title` returned `HTTP/1.1 400 Bad Request`.
+- `POST /tasks` with a valid title returned `HTTP/1.1 201 Created` and included `ID`, `CreatedAt`, and `UpdatedAt`.
+- Review record: `reviews/2026-06-13-t006-implement-task-creation.md`.

@@ -95,7 +95,7 @@ Skills:
 
 ### T006: Implement Task Creation
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -110,7 +110,7 @@ Skills:
 
 ### T007: Implement Task List Query
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 
