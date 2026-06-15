@@ -17,7 +17,10 @@ func NewTaskService(repo *repository.TaskRepo) *TaskService {
 	return &TaskService{repo: repo}
 }
 
-var ErrTitleRequired = errors.New("title is required")
+var (
+	ErrTitleRequired = errors.New("title is required")
+	ParaInvalid      = errors.New("error parameters")
+)
 
 func (s *TaskService) Create(title, description string) (*model.Task, error) {
 	title = strings.TrimSpace(title)
@@ -35,4 +38,15 @@ func (s *TaskService) Create(title, description string) (*model.Task, error) {
 		return nil, fmt.Errorf("create task error: %w", err)
 	}
 	return task, nil
+}
+
+func (s *TaskService) List(limit, offset int) ([]*model.Task, error) {
+	if limit <= 0 || offset < 0 {
+		return nil, ParaInvalid
+	}
+	tasks, err := s.repo.List(limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list tasks error :%w", err)
+	}
+	return tasks, nil
 }

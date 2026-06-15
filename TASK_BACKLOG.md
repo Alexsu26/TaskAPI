@@ -110,7 +110,7 @@ Skills:
 
 ### T007: Implement Task List Query
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -125,7 +125,7 @@ Skills:
 
 ### T008: Implement Task Detail, Update, And Delete
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

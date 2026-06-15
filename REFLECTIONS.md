@@ -232,3 +232,42 @@ Evidence:
 - `POST /tasks` with whitespace-only `title` returned `HTTP/1.1 400 Bad Request`.
 - `POST /tasks` with a valid title returned `HTTP/1.1 201 Created` and included `ID`, `CreatedAt`, and `UpdatedAt`.
 - Review record: `reviews/2026-06-13-t006-implement-task-creation.md`.
+
+### 2026-06-15: T007 Implement Task List Query
+
+Task:
+
+- Implemented and reviewed `GET /tasks` with `limit` and `offset` pagination.
+- Wired the list flow through handler, service, repository, and PostgreSQL.
+
+What went well:
+
+- Preserved the existing handler/service/repository boundaries.
+- Used `db.Query`, `rows.Next`, `rows.Scan`, `rows.Err`, and `rows.Close` correctly for multi-row SQL reads.
+- Avoided `select *` and scanned explicit columns into `model.Task`.
+- Added stable ordering with `updated_at DESC, id DESC`.
+- Returned 400 for invalid pagination input and preserved `/health`.
+
+Weak areas:
+
+- The first implementation attempts confused `Exec`, `Query`, and result scanning.
+- Go variable scope around `:=` inside `if` blocks needed clarification.
+- Error naming and response text such as `ParaInvalid` and `error parameters` should be made clearer in a later cleanup.
+
+Next improvement:
+
+- In T008, focus on detail/update/delete status codes, especially distinguishing invalid ID, not found, and internal database errors.
+- Continue keeping successful and error handler control flow explicit with `return` after each error response.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all current packages.
+- `SERVER_PORT=18080 go run ./cmd/server` started the current source.
+- `GET /health` returned `HTTP/1.1 200 OK`.
+- `GET /tasks` returned `HTTP/1.1 200 OK` with task data from PostgreSQL.
+- `GET /tasks?limit=10&offset=0` returned `HTTP/1.1 200 OK`.
+- `GET /tasks?limit=1&offset=1` returned one later page result, showing offset behavior.
+- `GET /tasks?limit=-1&offset=0` returned `HTTP/1.1 400 Bad Request`.
+- `GET /tasks?limit=abc&offset=0` returned `HTTP/1.1 400 Bad Request`.
+- Review record: `reviews/2026-06-15-t007-implement-task-list-query.md`.

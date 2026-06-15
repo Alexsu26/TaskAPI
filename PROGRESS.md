@@ -10,7 +10,7 @@ Stage 1: Go Task API
 
 ## Status
 
-T006 completed and verified
+T007 completed and verified
 
 ## Completed
 
@@ -23,6 +23,7 @@ T006 completed and verified
 - [x] Added task model
 - [x] Added user model
 - [x] Added task creation endpoint
+- [x] Added task list endpoint
 - [ ] Added task CRUD
 - [ ] Added user registration
 - [ ] Added password hashing
@@ -39,8 +40,8 @@ None
 
 ## Next Action
 
-Start Task `T007`: implement task list query.
+Start Task `T008`: implement task detail, update, and delete.
 
 ## Last Updated
 
-2026-06-13
+2026-06-15
