@@ -10,6 +10,10 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - `[~]`: practiced but not stable yet
 - `[x]`: used in a project and reviewed
 
+## Recent Evidence
+
+- 2026-06-15 T007 practiced REST list endpoint design, Gin query parsing, service/repository boundaries, SQL `SELECT` with `LIMIT` and `OFFSET`, stable ordering, pagination validation, and response design. Review verified `gofmt -l cmd/server internal`, `go test ./...`, `/health`, `GET /tasks`, valid pagination, invalid pagination, and offset behavior. Error handling remains `[~]` because error naming and client messages still need polish.
+
 ## Go Required Skills
 
 - [x] `struct` and data modeling
