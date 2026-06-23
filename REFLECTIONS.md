@@ -271,3 +271,37 @@ Evidence:
 - `GET /tasks?limit=-1&offset=0` returned `HTTP/1.1 400 Bad Request`.
 - `GET /tasks?limit=abc&offset=0` returned `HTTP/1.1 400 Bad Request`.
 - Review record: `reviews/2026-06-15-t007-implement-task-list-query.md`.
+
+### 2026-06-23: T008 Implement Task Detail, Update, And Delete
+
+Task:
+
+- Implemented and reviewed `GET /tasks/:id`, `PUT /tasks/:id`, and `DELETE /tasks/:id`.
+- Wired detail, update, and delete through handler, service, and repository boundaries.
+- Refactored pagination to move default values and range validation from handler to service.
+
+What went well:
+
+- Asked strong architectural questions about layer responsibilities — specifically whether query parameter parsing belongs in handler or service, and whether three-layer separation adds value when errors flow through all layers.
+- Refactored pagination correctly using `*int` pointers to distinguish "not provided" from "explicitly zero", moving business policy (defaults, limits) to the service layer.
+- Three-layer error mapping is clean: repository `ErrTaskNotFound` → service translation → handler HTTP 404.
+- Correctly handled `sql.ErrNoRows`, `RowsAffected`, and `UPDATE ... RETURNING` patterns.
+- Responded to iterative review feedback and fixed all critical bugs across two rounds.
+
+Weak areas:
+
+- Route registration in `SetupRouter` was missed twice — once for `GetByID`, once for `Update`/`Delete`. Need to build a habit of verifying router wiring before testing.
+- Copy-paste errors (JSON tag `json:"title"` for Description field, hardcoded `"id"` string instead of `ctx.Param("id")`) suggest need for more self-review before requesting external review.
+- Nil pointer panic from named return value `task *model.Task` shows Go pointer semantics still need reinforcement — named return pointers start as `nil` and must be allocated before use.
+
+Next improvement:
+
+- In T009, focus on removing inline error-to-status-code mapping from individual handlers and centralizing response/error handling.
+- Before requesting review, self-check: all routes registered in `SetupRouter`, all `Scan` arguments match `SELECT` columns, all JSON tags correct, all `ctx.Param` calls use actual parameter.
+
+Evidence:
+
+- `go build ./...` succeeded.
+- `go vet ./...` succeeded.
+- `go test ./...` passed for all packages.
+- Review record: `reviews/2026-06-23-t008-task-crud-detail-update-delete.md`.

@@ -10,7 +10,7 @@ Stage 1: Go Task API
 
 ## Status
 
-T007 completed and verified
+T008 completed and verified
 
 ## Completed
 
@@ -24,7 +24,7 @@ T007 completed and verified
 - [x] Added user model
 - [x] Added task creation endpoint
 - [x] Added task list endpoint
-- [ ] Added task CRUD
+- [x] Added task CRUD (detail, update, delete)
 - [ ] Added user registration
 - [ ] Added password hashing
 - [ ] Added login
@@ -40,8 +40,8 @@ None
 
 ## Next Action
 
-Start Task `T008`: implement task detail, update, and delete.
+Start Task `T009`: add unified response and error handling.
 
 ## Last Updated
 
-2026-06-15
+2026-06-23

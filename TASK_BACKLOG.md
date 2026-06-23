@@ -125,7 +125,7 @@ Skills:
 
 ### T008: Implement Task Detail, Update, And Delete
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -137,6 +137,40 @@ Skills:
 - SQL update/delete
 - error handling
 - status code design
+
+## Improvement Items (from T008 review)
+
+### IMP-001: Standardize Negative/Zero ID Validation
+
+Status: `[ ]`
+
+Objective:
+
+- Make ID validation consistent across GetByID, Update, and Delete. Currently Delete validates `id <= 0` and returns 400, but GetByID and Update do not and return 404.
+
+### IMP-002: Add JSON Tags To Task Model Or Introduce DTO Layer
+
+Status: `[ ]`
+
+Objective:
+
+- API currently returns Go-style field names (`ID`, `UserID`). Add `json:"..."` tags for snake_case output, or introduce a DTO layer in T018.
+
+### IMP-003: Add Status Field Validation
+
+Status: `[ ]`
+
+Objective:
+
+- Task update currently accepts any string for `status`. Add a whitelist of allowed values (e.g., `todo`, `doing`, `done`) in the service layer.
+
+### IMP-004: Prevent Internal Error Leakage In Delete Handler
+
+Status: `[ ]`
+
+Objective:
+
+- Delete handler uses `err.Error()` in the 500 response body. Replace with a generic message consistent with other handlers.
 
 ### T009: Add Unified Response And Error Handling
 

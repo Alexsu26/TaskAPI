@@ -12,7 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
-- 2026-06-15 T007 practiced REST list endpoint design, Gin query parsing, service/repository boundaries, SQL `SELECT` with `LIMIT` and `OFFSET`, stable ordering, pagination validation, and response design. Review verified `gofmt -l cmd/server internal`, `go test ./...`, `/health`, `GET /tasks`, valid pagination, invalid pagination, and offset behavior. Error handling remains `[~]` because error naming and client messages still need polish.
+- 2026-06-23 T008 practiced REST CRUD (detail, update, delete), route parameters with `ctx.Param`, handler/service/repository boundaries for `SELECT`/`UPDATE`/`DELETE`, `sql.ErrNoRows` handling, `RowsAffected` for delete, `UPDATE ... RETURNING`, nil pointer prevention with named return values, pagination refactoring (`*int` pointers for default-value ownership in service layer), and HTTP status code design (200, 204, 400, 404, 500). Review verified `go build`, `go vet`, and `go test ./...` all pass clean. Error handling improved but remains `[~]` — ID validation inconsistency and internal error leakage deferred to backlog (IMP-001, IMP-004).
 
 ## Go Required Skills
 

@@ -46,63 +46,21 @@ Summary:
 - Used stable ordering with `updated_at DESC, id DESC`.
 - Preserved `/health` and kept detail/update/delete/auth out of scope.
 
-## Active Task
-
 ### T008: Implement Task Detail, Update, And Delete
+Status: Completed and verified on 2026-06-23.
 
-Objective:
+Summary:
 
-Implement task detail lookup, update, and deletion.
+- Added `GET /tasks/:id`, `PUT /tasks/:id`, and `DELETE /tasks/:id` routes.
+- Wired detail, update, and delete through handler, service, and repository boundaries.
+- Used `SELECT ... WHERE id = $1` with `QueryRow` + `Scan` for detail lookup.
+- Used `UPDATE ... SET ... WHERE id = $1 RETURNING ...` for update with full row return.
+- Used `DELETE FROM tasks WHERE id = $1` with `RowsAffected` check for delete.
+- Mapped `sql.ErrNoRows` and `RowsAffected == 0` to `ErrTaskNotFound` → HTTP 404.
+- Refactored pagination: handler parses strings, service owns default values and range validation using `*int` pointers.
+- Deferred minor improvements to backlog: ID validation consistency, JSON tags, status whitelist, error message leakage.
 
-Learner should implement:
-
-- route parameters for task ID
-- handler entrypoints for detail, update, and delete
-- service/repository boundaries needed for lookup, update, and delete
-- database queries for `SELECT`, `UPDATE`, and `DELETE`
-- clear behavior for missing tasks and invalid IDs
-- status code choices for successful update and delete
-
-Agent may provide:
-
-- route and package boundary suggestions
-- request/response contract review
-- repository query examples
-- SQL `SELECT`, `UPDATE`, and `DELETE` explanation
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement the full handler/service/repository flow unless explicitly requested
-- implement authentication or current-user ownership yet
-- implement unified error handling yet
-
-Acceptance Criteria:
-
-- `GET /tasks/:id` route exists.
-- `PUT` or `PATCH /tasks/:id` route exists for updating a task.
-- `DELETE /tasks/:id` route exists.
-- invalid task IDs return a clear client error.
-- missing tasks return a clear not-found response.
-- valid detail request reads one task from PostgreSQL.
-- valid update request persists changes in PostgreSQL.
-- valid delete request removes the task from PostgreSQL or marks it deleted, depending on the chosen design.
-- code follows handler/service/repository package boundaries.
-- `go test ./...` still passes.
-- existing `/health` endpoint still works.
-- authentication remains out of scope.
-
-Skills Practiced:
-
-- REST API
-- handler/service/repository boundaries
-- SQL update/delete
-- error handling
-- status code design
-- validation
-
-## Upcoming Tasks
+## Active Task
 
 ### T009: Add Unified Response And Error Handling
 
@@ -110,11 +68,39 @@ Objective:
 
 Standardize API responses and application errors.
 
+Learner should implement:
+
+- a unified response wrapper for successful and error responses
+- a centralized error handler that maps service-layer errors to HTTP status codes
+- consistent error message format across all existing endpoints
+- removal of inline error-to-status-code mapping from individual handlers
+
+Agent may provide:
+
+- response envelope design suggestions
+- error mapping strategy review
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement authentication or current-user ownership yet
+- add new business endpoints
+
+Acceptance Criteria:
+
+- All endpoints return a consistent JSON response shape.
+- All errors use a centralized mapping instead of inline `if/else` chains in each handler.
+- `go test ./...` still passes.
+- existing `/health`, `POST /tasks`, `GET /tasks`, `GET /tasks/:id`, `PUT /tasks/:id`, `DELETE /tasks/:id` endpoints still work.
+
 Skills Practiced:
 
 - error handling
 - HTTP status codes
 - response design
+
+## Upcoming Tasks
 
 ### T010: Implement User Registration
 
@@ -128,3 +114,15 @@ Skills Practiced:
 - password hashing
 - validation
 - database uniqueness
+
+### T011: Implement User Login
+
+Objective:
+
+Add login with password verification.
+
+Skills Practiced:
+
+- authentication
+- error handling
+- security basics
