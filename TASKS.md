@@ -60,47 +60,19 @@ Summary:
 - Refactored pagination: handler parses strings, service owns default values and range validation using `*int` pointers.
 - Deferred minor improvements to backlog: ID validation consistency, JSON tags, status whitelist, error message leakage.
 
-## Active Task
-
 ### T009: Add Unified Response And Error Handling
+Status: Completed and verified on 2026-06-23.
 
-Objective:
+Summary:
 
-Standardize API responses and application errors.
+- Added a unified success/error response envelope through handler response helpers.
+- Centralized service-layer error mapping in handler code.
+- Preserved HTTP-layer parsing and binding errors as 400 responses while returning the same error envelope shape.
+- Restored `POST /tasks` to `201 Created` while using the unified success response.
+- Changed `DELETE /tasks/:id` from `204 No Content` to `200 OK` with the unified success response.
+- Verified `/health`, task create/list/detail/update/delete, invalid body, invalid query, invalid ID, and not-found paths.
 
-Learner should implement:
-
-- a unified response wrapper for successful and error responses
-- a centralized error handler that maps service-layer errors to HTTP status codes
-- consistent error message format across all existing endpoints
-- removal of inline error-to-status-code mapping from individual handlers
-
-Agent may provide:
-
-- response envelope design suggestions
-- error mapping strategy review
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement authentication or current-user ownership yet
-- add new business endpoints
-
-Acceptance Criteria:
-
-- All endpoints return a consistent JSON response shape.
-- All errors use a centralized mapping instead of inline `if/else` chains in each handler.
-- `go test ./...` still passes.
-- existing `/health`, `POST /tasks`, `GET /tasks`, `GET /tasks/:id`, `PUT /tasks/:id`, `DELETE /tasks/:id` endpoints still work.
-
-Skills Practiced:
-
-- error handling
-- HTTP status codes
-- response design
-
-## Upcoming Tasks
+## Active Task
 
 ### T010: Implement User Registration
 
@@ -108,12 +80,46 @@ Objective:
 
 Add user registration with password hashing.
 
+Learner should implement:
+
+- a `POST /users/register` or similar registration endpoint
+- request validation for required name/email/password fields
+- password hashing before storing the user
+- repository logic for inserting users into PostgreSQL
+- duplicate email handling with a clear 400 or 409 response
+
+Agent may provide:
+
+- schema and API contract suggestions
+- password hashing package guidance
+- validation and error mapping review
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement login yet
+- generate JWT yet
+- protect task routes yet
+- add current-user task ownership yet
+
+Acceptance Criteria:
+
+- A user can register through an HTTP endpoint.
+- Passwords are stored as hashes, not plaintext.
+- Duplicate email registration returns a clear client error.
+- Invalid request bodies and missing fields return clear client errors using the unified error response.
+- `go test ./...` still passes.
+- existing `/health` and task CRUD endpoints still work.
+
 Skills Practiced:
 
 - authentication
 - password hashing
 - validation
-- database uniqueness
+- error handling
+
+## Upcoming Tasks
 
 ### T011: Implement User Login
 
@@ -125,4 +131,16 @@ Skills Practiced:
 
 - authentication
 - error handling
+- security basics
+
+### T012: Implement JWT Generation And Parsing
+
+Objective:
+
+Generate JWT after login and parse JWT for later protected APIs.
+
+Skills Practiced:
+
+- JWT
+- configuration
 - security basics

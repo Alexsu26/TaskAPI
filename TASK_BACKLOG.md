@@ -166,7 +166,7 @@ Objective:
 
 ### IMP-004: Prevent Internal Error Leakage In Delete Handler
 
-Status: `[ ]`
+Status: `[x]`
 
 Objective:
 
@@ -174,7 +174,7 @@ Objective:
 
 ### T009: Add Unified Response And Error Handling
 
-Status: `[ ]`
+Status: `[x]`
 
 Objective:
 
@@ -188,7 +188,7 @@ Skills:
 
 ### T010: Implement User Registration
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

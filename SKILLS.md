@@ -12,13 +12,14 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
+- 2026-06-23 T009 practiced unified response design and centralized HTTP error handling. Learner introduced success/error response helpers, centralized service error mapping, kept HTTP parsing/binding errors as 400 responses, preserved `POST /tasks` as 201, and verified health, CRUD success paths, invalid body, invalid query, invalid ID, and not-found paths. Review verified `gofmt`, `go vet`, `go test ./...`, and runtime curl checks all pass. Error handling is now `[x]` for current Stage 1 CRUD scope, while later auth-specific error cases will be practiced again in T010-T014.
 - 2026-06-23 T008 practiced REST CRUD (detail, update, delete), route parameters with `ctx.Param`, handler/service/repository boundaries for `SELECT`/`UPDATE`/`DELETE`, `sql.ErrNoRows` handling, `RowsAffected` for delete, `UPDATE ... RETURNING`, nil pointer prevention with named return values, pagination refactoring (`*int` pointers for default-value ownership in service layer), and HTTP status code design (200, 204, 400, 404, 500). Review verified `go build`, `go vet`, and `go test ./...` all pass clean. Error handling improved but remains `[~]` — ID validation inconsistency and internal error leakage deferred to backlog (IMP-001, IMP-004).
 
 ## Go Required Skills
 
 - [x] `struct` and data modeling
 - [ ] `interface` and dependency boundaries
-- [~] error handling
+- [x] error handling
 - [x] Go package boundaries
 - [x] responsibility separation
 - [ ] goroutine

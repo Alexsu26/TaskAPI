@@ -6,11 +6,11 @@ Stage 1: Go Task API
 
 ## Current Substage
 
-1.3 Task CRUD
+1.4 User Auth
 
 ## Status
 
-T008 completed and verified
+T009 completed and verified
 
 ## Completed
 
@@ -25,6 +25,7 @@ T008 completed and verified
 - [x] Added task creation endpoint
 - [x] Added task list endpoint
 - [x] Added task CRUD (detail, update, delete)
+- [x] Added unified response and error handling
 - [ ] Added user registration
 - [ ] Added password hashing
 - [ ] Added login
@@ -40,7 +41,7 @@ None
 
 ## Next Action
 
-Start Task `T009`: add unified response and error handling.
+Start Task `T010`: implement user registration.
 
 ## Last Updated
 
