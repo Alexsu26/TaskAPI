@@ -305,3 +305,45 @@ Evidence:
 - `go vet ./...` succeeded.
 - `go test ./...` passed for all packages.
 - Review record: `reviews/2026-06-23-t008-task-crud-detail-update-delete.md`.
+
+### 2026-06-23: T009 Add Unified Response And Error Handling
+
+Task:
+
+- Implemented and reviewed unified success/error response helpers.
+- Centralized service-layer error mapping in handler code.
+- Updated existing `/health` and task CRUD endpoints to use the unified response shape.
+
+What went well:
+
+- Correctly identified that HTTP status code constants such as `http.StatusCreated` can be passed as `int` values into response helpers.
+- Restored `POST /tasks` to `201 Created` after the first review caught the accidental downgrade to `200 OK`.
+- Separated HTTP parsing/binding errors from service-layer sentinel errors after review feedback.
+- Final runtime checks showed a consistent error envelope for invalid body, invalid query, invalid ID, and not-found cases.
+
+Weak areas:
+
+- First implementation passed Gin binding and `strconv` parsing errors into the service error mapper, which caused client errors to become 500s.
+- Second implementation fixed status codes but left some HTTP-layer errors in the old `{"error": "..."}` response shape.
+- This task shows why response consistency needs runtime checks, not only compilation and unit-style command checks.
+
+Next improvement:
+
+- In T010, design user registration errors before implementing: invalid body, missing fields, duplicate email, hashing/storage failure.
+- Keep the distinction clear: handler handles HTTP parsing and response shape; service handles business validation; repository handles SQL.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- `docker compose up -d postgres` confirmed PostgreSQL was running.
+- `SERVER_PORT=18080 go run ./cmd/server` started the current source.
+- `GET /health` returned `HTTP/1.1 200 OK` with unified success response.
+- Invalid `POST /tasks` body returned `HTTP/1.1 400 Bad Request` with unified error response.
+- `GET /tasks?limit=abc` returned `HTTP/1.1 400 Bad Request` with unified error response.
+- `GET /tasks/nope` returned `HTTP/1.1 400 Bad Request` with unified error response.
+- `GET /tasks/999999999` returned `HTTP/1.1 404 Not Found` with unified error response.
+- Valid `POST /tasks` returned `HTTP/1.1 201 Created` with unified success response.
+- Valid list, update, and delete requests returned unified success responses.
+- Review record: `reviews/2026-06-23-t009-unified-response-error-handling.md`.

@@ -29,11 +29,33 @@ type UpdateTaskRequest struct {
 	Status      string `json:"status"`
 }
 
+func handlerServiceError(ctx *gin.Context, err error) {
+	if errors.Is(err, service.ErrParaInvalid) {
+		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "invalid parameter"}))
+		return
+	}
+	if errors.Is(err, service.ErrTitleRequired) {
+		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "missing task title"}))
+		return
+	}
+	if errors.Is(err, service.ErrTaskNotFound) {
+		ctx.JSON(http.StatusNotFound, FailResp(map[string]any{"message": "task not found"}))
+		return
+	}
+	ctx.JSON(http.StatusInternalServerError, FailResp(map[string]any{"message": "failed to execute"}))
+}
+
+func handlerCommonError(ctx *gin.Context, errCode int, message string) {
+	ctx.JSON(errCode, FailResp(map[string]any{"message": message}))
+}
+
+func handlerSuccessResp(ctx *gin.Context, statusCode int, data map[string]any) {
+	ctx.JSON(statusCode, SuccessResp(data))
+}
+
 func (h *Handler) RegisterHealthRoutes(r *gin.Engine) {
 	r.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-		})
+		handlerSuccessResp(ctx, http.StatusOK, nil)
 	})
 }
 
@@ -41,30 +63,16 @@ func (h *Handler) RegisterTaskCreateRoutes(r *gin.Engine) {
 	r.POST("/tasks", func(ctx *gin.Context) {
 		var req CreateTaskRequest
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "invalid request body",
-			})
+			handlerCommonError(ctx, http.StatusBadRequest, "invalid request body")
 			return
 		}
 		task, err := h.taskService.Create(req.Title, req.Description)
 		if err != nil {
-			if errors.Is(err, service.ErrTitleRequired) {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"error": err.Error(),
-				})
-				return
-			}
-
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": "failed to create task",
-			})
+			handlerServiceError(ctx, err)
 			return
 
 		}
-		ctx.JSON(http.StatusCreated, gin.H{
-			"status": "ok",
-			"task":   task,
-		})
+		handlerSuccessResp(ctx, http.StatusCreated, map[string]any{"task": task})
 	})
 }
 
@@ -91,29 +99,15 @@ func (h *Handler) RegisterTasksListRoutes(r *gin.Engine) {
 	r.GET("/tasks", func(ctx *gin.Context) {
 		limit, offset, err := parseListPara(ctx)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "invalid request parameters",
-			})
+			handlerCommonError(ctx, http.StatusBadRequest, "invalid request parameters")
 			return
 		}
 		tasks, err := h.taskService.List(limit, offset)
 		if err != nil {
-			if errors.Is(err, service.ErrParaInvalid) {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"error": err.Error(),
-				})
-				return
-			}
-
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": "failed to list tasks",
-			})
+			handlerServiceError(ctx, err)
 			return
 		}
-		ctx.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"tasks":  tasks,
-		})
+		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"tasks": tasks})
 	})
 }
 
@@ -121,34 +115,15 @@ func (h *Handler) RegisterGetTaskRoutes(r *gin.Engine) {
 	r.GET("/tasks/:id", func(ctx *gin.Context) {
 		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "request parameter id is invalid",
-			})
+			handlerCommonError(ctx, http.StatusBadRequest, "request parameter id is invalid")
 			return
 		}
 		task, err := h.taskService.GetByID(id)
 		if err != nil {
-			if errors.Is(err, service.ErrTaskNotFound) {
-				ctx.JSON(http.StatusNotFound, gin.H{
-					"error": err.Error(),
-				})
-				return
-			} else if errors.Is(err, service.ErrParaInvalid) {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"error": "invalid parameter",
-				})
-				return
-			}
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": "failed to get task",
-			})
+			handlerServiceError(ctx, err)
 			return
 		}
-
-		ctx.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"task":   task,
-		})
+		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"task": task})
 	})
 }
 
@@ -156,40 +131,20 @@ func (h *Handler) RegisterUpdateTaskRoutes(r *gin.Engine) {
 	r.PUT("/tasks/:id", func(ctx *gin.Context) {
 		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "request parameter id is invalid",
-			})
+			handlerCommonError(ctx, http.StatusBadRequest, "request parameter id is invalid")
 			return
 		}
 		var req UpdateTaskRequest
 		if err = ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "invalid request body",
-			})
+			handlerCommonError(ctx, http.StatusBadRequest, "invalid request body")
 			return
 		}
 		task, err := h.taskService.Update(id, req.Title, req.Description, req.Status)
 		if err != nil {
-			if errors.Is(err, service.ErrTaskNotFound) {
-				ctx.JSON(http.StatusNotFound, gin.H{
-					"error": "task not found",
-				})
-				return
-			} else if errors.Is(err, service.ErrParaInvalid) {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"error": "invalid parameter",
-				})
-				return
-			}
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": "update task failed",
-			})
+			handlerServiceError(ctx, err)
 			return
 		}
-		ctx.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-			"task":   task,
-		})
+		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"task": task})
 	})
 }
 
@@ -197,29 +152,14 @@ func (h *Handler) RegisterDeleteTaskRoutes(r *gin.Engine) {
 	r.DELETE("/tasks/:id", func(ctx *gin.Context) {
 		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "invalid task id",
-			})
+			handlerCommonError(ctx, http.StatusBadRequest, "invalid task id")
 			return
 		}
 		err = h.taskService.Delete(id)
 		if err != nil {
-			if errors.Is(err, service.ErrTaskNotFound) {
-				ctx.JSON(http.StatusNotFound, gin.H{
-					"error": "task not found",
-				})
-				return
-			} else if errors.Is(err, service.ErrParaInvalid) {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"error": "invalid parameter",
-				})
-				return
-			}
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": "failed to delete task",
-			})
+			handlerServiceError(ctx, err)
 			return
 		}
-		ctx.Status(http.StatusNoContent)
+		handlerSuccessResp(ctx, http.StatusOK, nil)
 	})
 }
