@@ -33,8 +33,10 @@ func run() error {
 	}
 	taskRepo := repository.NewTaskRepo(db)
 	taskService := service.NewTaskService(taskRepo)
-	taskHandler := handler.NewHandler(taskService)
-	r := router.SetupRouter(taskHandler)
+	userRepo := repository.NewUserRepo(db)
+	userService := service.NewUserService(userRepo)
+	handler := handler.NewHandler(taskService, userService)
+	r := router.SetupRouter(handler)
 
 	addr := ":" + cfg.Server.Port
 	if err := r.Run(addr); err != nil {

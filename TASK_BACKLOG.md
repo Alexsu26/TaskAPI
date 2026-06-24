@@ -188,7 +188,7 @@ Skills:
 
 ### T010: Implement User Registration
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -203,7 +203,7 @@ Skills:
 
 ### T011: Implement User Login
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

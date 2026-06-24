@@ -12,10 +12,11 @@ import (
 
 type Handler struct {
 	taskService *service.TaskService
+	userService *service.UserService
 }
 
-func NewHandler(taskService *service.TaskService) *Handler {
-	return &Handler{taskService: taskService}
+func NewHandler(taskService *service.TaskService, userService *service.UserService) *Handler {
+	return &Handler{taskService: taskService, userService: userService}
 }
 
 type CreateTaskRequest struct {
@@ -29,6 +30,18 @@ type UpdateTaskRequest struct {
 	Status      string `json:"status"`
 }
 
+type CreateUserRequest struct {
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type CreateUserResp struct {
+	ID    int64
+	Name  string
+	Email string
+}
+
 func handlerServiceError(ctx *gin.Context, err error) {
 	if errors.Is(err, service.ErrParaInvalid) {
 		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "invalid parameter"}))
@@ -40,6 +53,14 @@ func handlerServiceError(ctx *gin.Context, err error) {
 	}
 	if errors.Is(err, service.ErrTaskNotFound) {
 		ctx.JSON(http.StatusNotFound, FailResp(map[string]any{"message": "task not found"}))
+		return
+	}
+	if errors.Is(err, service.ErrEmailAlreadyExists) {
+		ctx.JSON(http.StatusConflict, FailResp(map[string]any{"message": "email already exists"}))
+		return
+	}
+	if errors.Is(err, service.ErrParaMiss) {
+		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "missing parameter"}))
 		return
 	}
 	ctx.JSON(http.StatusInternalServerError, FailResp(map[string]any{"message": "failed to execute"}))
@@ -161,5 +182,26 @@ func (h *Handler) RegisterDeleteTaskRoutes(r *gin.Engine) {
 			return
 		}
 		handlerSuccessResp(ctx, http.StatusOK, nil)
+	})
+}
+
+func (h *Handler) RegisterCreateUserRoutes(r *gin.Engine) {
+	r.POST("/users/register", func(ctx *gin.Context) {
+		var req CreateUserRequest
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			handlerCommonError(ctx, http.StatusBadRequest, "invalid request body")
+			return
+		}
+		user, err := h.userService.Create(req.Name, req.Email, req.Password)
+		if err != nil {
+			handlerServiceError(ctx, err)
+			return
+		}
+		resp := &CreateUserResp{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+		}
+		handlerSuccessResp(ctx, http.StatusCreated, map[string]any{"user": resp})
 	})
 }

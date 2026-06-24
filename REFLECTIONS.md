@@ -347,3 +347,45 @@ Evidence:
 - Valid `POST /tasks` returned `HTTP/1.1 201 Created` with unified success response.
 - Valid list, update, and delete requests returned unified success responses.
 - Review record: `reviews/2026-06-23-t009-unified-response-error-handling.md`.
+
+### 2026-06-24: T010 Implement User Registration
+
+Task:
+
+- Implemented and reviewed `POST /users/register` with password hashing.
+- Wired registration through handler, service, repository, and PostgreSQL.
+- Added duplicate email handling and unified error responses for invalid registration requests.
+
+What went well:
+
+- Preserved the existing handler/service/repository structure while adding user registration.
+- Used bcrypt for password hashing before persistence.
+- Mapped PostgreSQL unique email conflicts to a domain error and then to HTTP 409.
+- Responded to review feedback by replacing direct `model.User` response output with a DTO that does not expose `PasswordHash`.
+- Fixed the missing `return` after writing an error response, eliminating the double-write bug.
+
+Weak areas:
+
+- The first successful registration response exposed `PasswordHash`, showing that response DTO boundaries need attention when models contain sensitive fields.
+- The first `ErrParaMiss` mapping forgot to return after `ctx.JSON`, causing two JSON error bodies to be written for one request.
+- Missing/invalid request behavior still needs runtime checks, not only compile-time checks.
+
+Next improvement:
+
+- In T011, focus on password verification with bcrypt and avoid leaking whether email or password was wrong.
+- Continue self-checking every handler error branch for `return` after writing a response.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- `docker compose up -d postgres` confirmed PostgreSQL was running.
+- `SERVER_PORT=18080 go run ./cmd/server` started the current source.
+- `GET /health` returned `HTTP/1.1 200 OK`.
+- Valid `POST /users/register` returned `HTTP/1.1 201 Created` without `PasswordHash`.
+- Duplicate email registration returned `HTTP/1.1 409 Conflict`.
+- Missing password returned `HTTP/1.1 400 Bad Request`.
+- Whitespace-only name returned `HTTP/1.1 400 Bad Request` with a single unified error response.
+- `GET /tasks?limit=1&offset=0` returned `HTTP/1.1 200 OK`.
+- Review record: `reviews/2026-06-24-t010-user-registration.md`.
