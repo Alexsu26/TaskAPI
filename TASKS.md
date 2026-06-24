@@ -72,54 +72,21 @@ Summary:
 - Changed `DELETE /tasks/:id` from `204 No Content` to `200 OK` with the unified success response.
 - Verified `/health`, task create/list/detail/update/delete, invalid body, invalid query, invalid ID, and not-found paths.
 
-## Active Task
-
 ### T010: Implement User Registration
+Status: Completed and verified on 2026-06-24.
 
-Objective:
+Summary:
 
-Add user registration with password hashing.
+- Added `POST /users/register` for user registration.
+- Wired registration through handler, service, and repository boundaries.
+- Validated required `name`, `email`, and `password` fields, including whitespace-only values in the service layer.
+- Hashed passwords with bcrypt before storing them in PostgreSQL.
+- Inserted users with `INSERT ... RETURNING` so the response includes database-generated fields.
+- Mapped duplicate email conflicts to a clear `409 Conflict` unified error response.
+- Returned a dedicated user response DTO so `PasswordHash` is not exposed to clients.
+- Verified `/health`, task listing, registration success, duplicate email, missing field, and whitespace-only validation paths.
 
-Learner should implement:
-
-- a `POST /users/register` or similar registration endpoint
-- request validation for required name/email/password fields
-- password hashing before storing the user
-- repository logic for inserting users into PostgreSQL
-- duplicate email handling with a clear 400 or 409 response
-
-Agent may provide:
-
-- schema and API contract suggestions
-- password hashing package guidance
-- validation and error mapping review
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement login yet
-- generate JWT yet
-- protect task routes yet
-- add current-user task ownership yet
-
-Acceptance Criteria:
-
-- A user can register through an HTTP endpoint.
-- Passwords are stored as hashes, not plaintext.
-- Duplicate email registration returns a clear client error.
-- Invalid request bodies and missing fields return clear client errors using the unified error response.
-- `go test ./...` still passes.
-- existing `/health` and task CRUD endpoints still work.
-
-Skills Practiced:
-
-- authentication
-- password hashing
-- validation
-- error handling
-
-## Upcoming Tasks
+## Active Task
 
 ### T011: Implement User Login
 
@@ -127,11 +94,45 @@ Objective:
 
 Add login with password verification.
 
+Learner should implement:
+
+- a `POST /users/login` or similar login endpoint
+- request validation for required email/password fields
+- repository logic for finding a user by email
+- bcrypt password verification
+- clear client errors for invalid credentials
+
+Agent may provide:
+
+- API contract suggestions
+- password verification guidance
+- validation and error mapping review
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- generate JWT yet
+- protect task routes yet
+- add current-user task ownership yet
+
+Acceptance Criteria:
+
+- A registered user can log in with email and password.
+- Password verification uses bcrypt against the stored password hash.
+- Wrong email or wrong password returns a clear client error without revealing which field was wrong.
+- Invalid request bodies and missing fields return clear client errors using the unified error response.
+- `go test ./...` still passes.
+- existing `/health` and task CRUD endpoints still work.
+
 Skills Practiced:
 
 - authentication
+- password verification
+- validation
 - error handling
-- security basics
+
+## Upcoming Tasks
 
 ### T012: Implement JWT Generation And Parsing
 
@@ -144,3 +145,15 @@ Skills Practiced:
 - JWT
 - configuration
 - security basics
+
+### T013: Add Auth Middleware
+
+Objective:
+
+Protect private routes with JWT middleware.
+
+Skills Practiced:
+
+- middleware
+- request context
+- authorization

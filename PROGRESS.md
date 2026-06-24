@@ -10,7 +10,7 @@ Stage 1: Go Task API
 
 ## Status
 
-T009 completed and verified
+T010 completed and verified
 
 ## Completed
 
@@ -26,8 +26,8 @@ T009 completed and verified
 - [x] Added task list endpoint
 - [x] Added task CRUD (detail, update, delete)
 - [x] Added unified response and error handling
-- [ ] Added user registration
-- [ ] Added password hashing
+- [x] Added user registration
+- [x] Added password hashing
 - [ ] Added login
 - [ ] Added JWT middleware
 - [ ] Added basic tests
@@ -41,8 +41,8 @@ None
 
 ## Next Action
 
-Start Task `T010`: implement user registration.
+Start Task `T011`: implement user login.
 
 ## Last Updated
 
-2026-06-23
+2026-06-24
