@@ -36,15 +36,20 @@ type CreateUserRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type CreateUserResp struct {
+type UserLoginRequest struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type UserDTO struct {
 	ID    int64
 	Name  string
 	Email string
 }
 
-type UserLoginRequest struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+type UserLoginResp struct {
+	User  UserDTO
+	Token string
 }
 
 func handlerServiceError(ctx *gin.Context, err error) {
@@ -74,6 +79,10 @@ func handlerServiceError(ctx *gin.Context, err error) {
 	}
 	if errors.Is(err, service.ErrPasswordInvalid) {
 		ctx.JSON(http.StatusUnauthorized, FailResp(map[string]any{"message": "invalid email or password"}))
+		return
+	}
+	if errors.Is(err, service.ErrTokenInvalid) {
+		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "auth failed"}))
 		return
 	}
 	ctx.JSON(http.StatusInternalServerError, FailResp(map[string]any{"message": "failed to execute"}))
@@ -210,7 +219,8 @@ func (h *Handler) RegisterCreateUserRoutes(r *gin.Engine) {
 			handlerServiceError(ctx, err)
 			return
 		}
-		resp := &CreateUserResp{
+
+		resp := UserDTO{
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
@@ -226,16 +236,19 @@ func (h *Handler) RegisterUserLoginRoutes(r *gin.Engine) {
 			handlerCommonError(ctx, http.StatusBadRequest, "invalid request body")
 			return
 		}
-		user, err := h.userService.Login(req.Email, req.Password)
+		user, token, err := h.userService.Login(req.Email, req.Password)
 		if err != nil {
 			handlerServiceError(ctx, err)
 			return
 		}
-		resp := &CreateUserResp{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
+		resp := &UserLoginResp{
+			User: UserDTO{
+				ID:    user.ID,
+				Name:  user.Name,
+				Email: user.Email,
+			},
+			Token: token,
 		}
-		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"user": resp})
+		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"user": resp.User, "token": resp.Token})
 	})
 }

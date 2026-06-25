@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"taskapi/internal/auth"
 	"taskapi/internal/model"
 	"taskapi/internal/repository"
 
@@ -11,11 +12,12 @@ import (
 )
 
 type UserService struct {
-	repo *repository.UserRepo
+	repo         *repository.UserRepo
+	tokenManager *auth.TokenManager
 }
 
-func NewUserService(repo *repository.UserRepo) *UserService {
-	return &UserService{repo: repo}
+func NewUserService(repo *repository.UserRepo, tokenManager *auth.TokenManager) *UserService {
+	return &UserService{repo: repo, tokenManager: tokenManager}
 }
 
 var (
@@ -23,6 +25,7 @@ var (
 	ErrParaMiss           = errors.New("missing parameter")
 	ErrPasswordInvalid    = errors.New("password invalid")
 	ErrInvalidCredentials = errors.New("invalid email or wrong password")
+	ErrTokenInvalid       = errors.New("auth failed, token generate failed")
 )
 
 func (s *UserService) Create(name, email, password string) (*model.User, error) {
@@ -51,23 +54,30 @@ func (s *UserService) Create(name, email, password string) (*model.User, error) 
 	return user, nil
 }
 
-func (s *UserService) Login(email, password string) (*model.User, error) {
+func (s *UserService) Login(email, password string) (*model.User, string, error) {
 	email = strings.TrimSpace(email)
 	password = strings.TrimSpace(password)
 	if email == "" || password == "" {
-		return nil, ErrParaMiss
+		return nil, "", ErrParaMiss
 	}
 	user, err := s.repo.FindByEmail(email)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
-			return nil, ErrInvalidCredentials
+			return nil, "", ErrInvalidCredentials
 		}
-		return nil, err
+		return nil, "", err
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		return nil, ErrInvalidCredentials
+		return nil, "", ErrInvalidCredentials
 	}
 	user.PasswordHash = ""
-	return user, nil
+	token, err := s.tokenManager.GenerateToken(user.ID)
+	if err != nil {
+		if errors.Is(err, auth.ErrTokenInvalid) {
+			return nil, "", ErrTokenInvalid
+		}
+		return nil, "", err
+	}
+	return user, token, nil
 }

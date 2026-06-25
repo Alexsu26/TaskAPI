@@ -217,7 +217,7 @@ Skills:
 
 ### T012: Implement JWT Generation And Parsing
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -231,7 +231,7 @@ Skills:
 
 ### T013: Add Auth Middleware
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

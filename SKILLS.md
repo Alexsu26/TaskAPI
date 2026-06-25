@@ -12,6 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
+- 2026-06-25 T012 practiced JWT generation and parsing. Learner added `JWT_SECRET` and `JWT_EXPIRATION_MINUTES` configuration, introduced an `internal/auth` token manager, generated `HS256` JWTs with `user_id`, `exp`, and `iat` claims, validated signing method, signature, expiration, and positive user ID during parsing, injected token configuration through `main` into the user service, and returned a token from successful login without exposing `PasswordHash`. Review verified `gofmt`, `go test ./...`, `go vet ./...`, and runtime checks for `/health`, registration, login token response, wrong-password login, and task listing. JWT is now `[x]`; authentication remains `[~]` until middleware and current-user authorization are complete.
 - 2026-06-24 T011 practiced user login and password verification. Learner added `POST /users/login`, preserved handler/service/repository boundaries, added email lookup with `sql.ErrNoRows` mapped to a repository not-found error, verified passwords with `bcrypt.CompareHashAndPassword`, unified wrong-email and wrong-password responses as HTTP 401 without revealing which field was wrong, and kept `PasswordHash` out of the login response. Review verified `gofmt`, `go test ./...`, `go vet ./...`, and runtime checks for login success, wrong password, wrong email, missing password, whitespace-only password, `/health`, and task listing. Authentication remains `[~]` until JWT generation, middleware, and current-user task ownership are complete.
 - 2026-06-24 T010 practiced the first auth workflow with user registration and password hashing. Learner added `POST /users/register`, wired handler/service/repository boundaries, hashed passwords with bcrypt, handled duplicate email with PostgreSQL unique violation code `23505` mapped to HTTP 409, returned a DTO without `PasswordHash`, and fixed a double-response bug caused by a missing `return` after an error response. Review verified `gofmt`, `go test ./...`, `go vet ./...`, and runtime checks for registration success, duplicate email, missing password, whitespace-only fields, `/health`, and task listing.
 - 2026-06-23 T009 practiced unified response design and centralized HTTP error handling. Learner introduced success/error response helpers, centralized service error mapping, kept HTTP parsing/binding errors as 400 responses, preserved `POST /tasks` as 201, and verified health, CRUD success paths, invalid body, invalid query, invalid ID, and not-found paths. Review verified `gofmt`, `go vet`, `go test ./...`, and runtime curl checks all pass. Error handling is now `[x]` for current Stage 1 CRUD scope, while later auth-specific error cases will be practiced again in T010-T014.
@@ -32,7 +33,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] GORM or `sqlc`
 - [x] PostgreSQL
 - [ ] Redis
-- [ ] JWT
+- [x] JWT
 - [~] Docker
 - [ ] testing
 - [ ] logging
