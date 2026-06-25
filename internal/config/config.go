@@ -1,10 +1,14 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	Auth     AuthConfig
 }
 
 type ServerConfig struct {
@@ -19,6 +23,11 @@ type DatabaseConfig struct {
 	Name     string
 }
 
+type AuthConfig struct {
+	JWTSecret            string
+	JWTExpirationMinutes int
+}
+
 func Load() (Config, error) {
 	cfg := Config{
 		Server: ServerConfig{
@@ -31,6 +40,10 @@ func Load() (Config, error) {
 			Password: envOrDefault("DATABASE_PASSWORD", "taskapi"),
 			Name:     envOrDefault("DATABASE_NAME", "taskapi"),
 		},
+		Auth: AuthConfig{
+			JWTSecret:            envOrDefault("JWT_SECRET", "dev-jwt-secret"),
+			JWTExpirationMinutes: envIntOrDefault("JWT_EXPIRATION_MINUTES", 60),
+		},
 	}
 
 	return cfg, nil
@@ -42,4 +55,16 @@ func envOrDefault(key string, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+func envIntOrDefault(key string, defaultValue int) int {
+	value, ok := os.LookupEnv(key)
+	if !ok || value == "" {
+		return defaultValue
+	}
+	parsed, err := strconv.Atoi(value)
+	if err != nil || parsed <= 0 {
+		return defaultValue
+	}
+	return parsed
 }

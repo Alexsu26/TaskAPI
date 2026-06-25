@@ -26,6 +26,46 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-25: T012 Implement JWT Generation And Parsing
+
+Task:
+
+- Implemented and reviewed JWT configuration, token generation, token parsing, and login token response.
+
+What went well:
+
+- Kept JWT code in a dedicated `internal/auth` boundary instead of mixing signing logic into handlers.
+- Passed JWT secret and expiration from config through startup into the token manager, which keeps configuration ownership clear.
+- Used `jwt.RegisteredClaims` with `exp` and `iat`, and included `user_id` for later middleware.
+- Added signing-method validation, expired-token detection, and positive user ID validation during parsing.
+- Corrected response envelope nesting after review so registration and login responses stay consistent.
+
+Weak areas:
+
+- Needed guidance on JWT concepts, `IssuedAt`, signing, and the relationship between token helpers and business validation.
+- First response-shape attempt added an extra nested `data` object and changed registration response shape unintentionally.
+- Token generation initially needed a reminder to reject invalid user IDs at the generation boundary.
+
+Next improvement:
+
+- In T013, focus on Gin middleware flow, `Authorization: Bearer <token>` parsing, and storing the current user ID in request context.
+- Keep auth middleware responsible for request authentication only; defer task ownership filtering to T014.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` produced no output.
+- `docker compose up -d postgres` confirmed PostgreSQL was running.
+- `SERVER_PORT=18080 JWT_SECRET=acceptance-secret JWT_EXPIRATION_MINUTES=60 go run ./cmd/server` started the service.
+- `GET /health` returned 200.
+- `POST /users/register` returned 201 with a user DTO and no `PasswordHash`.
+- `POST /users/login` returned 200 with a user DTO and JWT token.
+- The login token had three JWT segments and decoded payload fields `user_id`, `exp`, and `iat`.
+- `POST /users/login` with wrong password returned 401.
+- `GET /tasks?limit=1&offset=0` returned 200.
+- Review record: `reviews/2026-06-25-t012-jwt-generation-and-parsing.md`.
+
 ### 2026-06-05: T001 Initialize Go Gin Project
 
 Task:

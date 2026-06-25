@@ -100,51 +100,20 @@ Summary:
 - Returned a user response DTO without `PasswordHash`.
 - Verified `/health`, task listing, registration success, login success, wrong password, wrong email, missing password, and whitespace-only password paths.
 
-## Active Task
-
 ### T012: Implement JWT Generation And Parsing
+Status: Completed and verified on 2026-06-25.
 
-Objective:
+Summary:
 
-Generate JWT after login and parse JWT for later protected APIs.
+- Added JWT configuration values for token secret and expiration minutes.
+- Added an `internal/auth` token manager for JWT generation and parsing.
+- Generated signed JWTs with `HS256`, `user_id`, `exp`, and `iat` claims.
+- Added parsing logic that validates signing method, signature, expiration, and positive user ID.
+- Injected the token manager through startup into the user service instead of reading config directly from auth helpers.
+- Updated successful login responses to include both the user DTO and JWT token without exposing `PasswordHash`.
+- Verified `/health`, task listing, registration success, login success with token, and wrong-password login behavior.
 
-Learner should implement:
-
-- JWT configuration values such as secret and expiration
-- token generation after successful login
-- token parsing and validation helper logic
-- clear errors for invalid, malformed, or expired tokens
-
-Agent may provide:
-
-- JWT claim design guidance
-- configuration and security review
-- validation and error mapping review
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- protect task routes yet
-- add current-user task ownership yet
-
-Acceptance Criteria:
-
-- Successful login returns a JWT token.
-- JWT includes enough claims for later auth middleware, at minimum user ID and expiration.
-- Token secret and expiration are loaded from configuration rather than hardcoded deep in business logic.
-- Invalid or expired tokens can be detected by a parsing helper.
-- `go test ./...` still passes.
-- existing `/health`, user registration, user login, and task CRUD endpoints still work.
-
-Skills Practiced:
-
-- JWT
-- configuration
-- security basics
-- error handling
-
-## Upcoming Tasks
+## Active Task
 
 ### T013: Add Auth Middleware
 
@@ -152,8 +121,55 @@ Objective:
 
 Protect private routes with JWT middleware.
 
+Learner should implement:
+
+- middleware that reads the `Authorization` header
+- `Bearer <token>` parsing
+- JWT validation through the existing token manager
+- current user ID storage in Gin context for later service use
+- clear `401 Unauthorized` responses for missing, malformed, invalid, or expired tokens
+
+Agent may provide:
+
+- middleware structure guidance
+- Gin context usage guidance
+- auth error mapping review
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- change repository SQL ownership filtering yet
+- implement current-user task ownership yet
+
+Acceptance Criteria:
+
+- Requests without `Authorization` are rejected for protected routes.
+- Requests with malformed `Authorization` are rejected.
+- Requests with invalid or expired JWTs are rejected.
+- Requests with a valid JWT can pass through middleware.
+- The middleware stores current user ID in request context.
+- `go test ./...` still passes.
+- Existing `/health`, user registration, and user login endpoints still work.
+- Do not yet restrict task rows by current user; that belongs to T014.
+
 Skills Practiced:
 
 - middleware
 - request context
 - authorization
+- JWT
+
+## Upcoming Tasks
+
+### T014: Restrict Tasks To The Current User
+
+Objective:
+
+Ensure users can only access their own tasks.
+
+Skills Practiced:
+
+- authorization
+- SQL filtering
+- service-layer validation

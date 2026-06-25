@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
+	"taskapi/internal/auth"
 	"taskapi/internal/config"
 	"taskapi/internal/database"
 	"taskapi/internal/handler"
@@ -33,8 +35,12 @@ func run() error {
 	}
 	taskRepo := repository.NewTaskRepo(db)
 	taskService := service.NewTaskService(taskRepo)
+
+	tokenManager := auth.NewTokenManager(
+		cfg.Auth.JWTSecret,
+		time.Duration(cfg.Auth.JWTExpirationMinutes)*time.Minute)
 	userRepo := repository.NewUserRepo(db)
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(userRepo, tokenManager)
 	handler := handler.NewHandler(taskService, userService)
 	r := router.SetupRouter(handler)
 

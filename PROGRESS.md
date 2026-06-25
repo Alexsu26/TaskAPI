@@ -10,7 +10,7 @@ Stage 1: Go Task API
 
 ## Status
 
-T011 completed and verified
+T012 completed and verified
 
 ## Completed
 
@@ -29,6 +29,7 @@ T011 completed and verified
 - [x] Added user registration
 - [x] Added password hashing
 - [x] Added login
+- [x] Added JWT generation and parsing
 - [ ] Added JWT middleware
 - [ ] Added basic tests
 - [ ] Added Dockerfile
@@ -41,8 +42,8 @@ None
 
 ## Next Action
 
-Start Task `T012`: implement JWT generation and parsing.
+Start Task `T013`: add JWT auth middleware.
 
 ## Last Updated
 
-2026-06-24
+2026-06-25
