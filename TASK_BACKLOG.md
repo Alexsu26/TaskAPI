@@ -203,7 +203,7 @@ Skills:
 
 ### T011: Implement User Login
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -217,7 +217,7 @@ Skills:
 
 ### T012: Implement JWT Generation And Parsing
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

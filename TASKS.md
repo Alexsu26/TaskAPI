@@ -86,53 +86,21 @@ Summary:
 - Returned a dedicated user response DTO so `PasswordHash` is not exposed to clients.
 - Verified `/health`, task listing, registration success, duplicate email, missing field, and whitespace-only validation paths.
 
-## Active Task
-
 ### T011: Implement User Login
+Status: Completed and verified on 2026-06-24.
 
-Objective:
+Summary:
 
-Add login with password verification.
+- Added `POST /users/login` for user login.
+- Wired login through handler, service, and repository boundaries.
+- Added repository lookup by email with `sql.ErrNoRows` mapped to a repository-level not-found error.
+- Validated required `email` and `password` fields, including whitespace-only values in the service layer.
+- Verified passwords with `bcrypt.CompareHashAndPassword` against the stored password hash.
+- Returned a unified `401 Unauthorized` error for wrong email and wrong password without revealing which field was wrong.
+- Returned a user response DTO without `PasswordHash`.
+- Verified `/health`, task listing, registration success, login success, wrong password, wrong email, missing password, and whitespace-only password paths.
 
-Learner should implement:
-
-- a `POST /users/login` or similar login endpoint
-- request validation for required email/password fields
-- repository logic for finding a user by email
-- bcrypt password verification
-- clear client errors for invalid credentials
-
-Agent may provide:
-
-- API contract suggestions
-- password verification guidance
-- validation and error mapping review
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- generate JWT yet
-- protect task routes yet
-- add current-user task ownership yet
-
-Acceptance Criteria:
-
-- A registered user can log in with email and password.
-- Password verification uses bcrypt against the stored password hash.
-- Wrong email or wrong password returns a clear client error without revealing which field was wrong.
-- Invalid request bodies and missing fields return clear client errors using the unified error response.
-- `go test ./...` still passes.
-- existing `/health` and task CRUD endpoints still work.
-
-Skills Practiced:
-
-- authentication
-- password verification
-- validation
-- error handling
-
-## Upcoming Tasks
+## Active Task
 
 ### T012: Implement JWT Generation And Parsing
 
@@ -140,11 +108,43 @@ Objective:
 
 Generate JWT after login and parse JWT for later protected APIs.
 
+Learner should implement:
+
+- JWT configuration values such as secret and expiration
+- token generation after successful login
+- token parsing and validation helper logic
+- clear errors for invalid, malformed, or expired tokens
+
+Agent may provide:
+
+- JWT claim design guidance
+- configuration and security review
+- validation and error mapping review
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- protect task routes yet
+- add current-user task ownership yet
+
+Acceptance Criteria:
+
+- Successful login returns a JWT token.
+- JWT includes enough claims for later auth middleware, at minimum user ID and expiration.
+- Token secret and expiration are loaded from configuration rather than hardcoded deep in business logic.
+- Invalid or expired tokens can be detected by a parsing helper.
+- `go test ./...` still passes.
+- existing `/health`, user registration, user login, and task CRUD endpoints still work.
+
 Skills Practiced:
 
 - JWT
 - configuration
 - security basics
+- error handling
+
+## Upcoming Tasks
 
 ### T013: Add Auth Middleware
 

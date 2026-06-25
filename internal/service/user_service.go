@@ -22,6 +22,7 @@ var (
 	ErrEmailAlreadyExists = errors.New("email already exists")
 	ErrParaMiss           = errors.New("missing parameter")
 	ErrPasswordInvalid    = errors.New("password invalid")
+	ErrInvalidCredentials = errors.New("invalid email or wrong password")
 )
 
 func (s *UserService) Create(name, email, password string) (*model.User, error) {
@@ -47,5 +48,26 @@ func (s *UserService) Create(name, email, password string) (*model.User, error) 
 		}
 		return nil, err
 	}
+	return user, nil
+}
+
+func (s *UserService) Login(email, password string) (*model.User, error) {
+	email = strings.TrimSpace(email)
+	password = strings.TrimSpace(password)
+	if email == "" || password == "" {
+		return nil, ErrParaMiss
+	}
+	user, err := s.repo.FindByEmail(email)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return nil, ErrInvalidCredentials
+		}
+		return nil, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	if err != nil {
+		return nil, ErrInvalidCredentials
+	}
+	user.PasswordHash = ""
 	return user, nil
 }
