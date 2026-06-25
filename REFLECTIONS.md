@@ -389,3 +389,47 @@ Evidence:
 - Whitespace-only name returned `HTTP/1.1 400 Bad Request` with a single unified error response.
 - `GET /tasks?limit=1&offset=0` returned `HTTP/1.1 200 OK`.
 - Review record: `reviews/2026-06-24-t010-user-registration.md`.
+
+### 2026-06-24: T011 Implement User Login
+
+Task:
+
+- Implemented and reviewed `POST /users/login` with password verification.
+- Added repository lookup by email and service-layer credential validation.
+- Kept JWT generation, route protection, and task ownership changes out of scope for the next tasks.
+
+What went well:
+
+- Preserved the existing handler/service/repository boundaries while adding login.
+- Correctly added `FindByEmail` in the repository and mapped `sql.ErrNoRows` to a repository-level not-found error.
+- After review, replaced incorrect bcrypt hash string comparison with `bcrypt.CompareHashAndPassword`.
+- After review, mapped wrong email and wrong password to the same `401 Unauthorized` response so the API does not reveal which credential was wrong.
+- Login success returns a user DTO without `PasswordHash`.
+
+Weak areas:
+
+- The first implementation re-hashed the submitted password and compared hash strings. bcrypt hashes include salt, so the same password does not produce the same hash string each time.
+- The first error mapping returned `missing parameter` for invalid credentials, which made authentication failures look like request-shape errors.
+- One handler error branch initially missed `return` after writing `ctx.JSON`, repeating a control-flow issue seen in T010.
+
+Next improvement:
+
+- In T012, focus on JWT claim design, config loading for token secret/expiration, and parsing errors.
+- Continue self-checking auth code for three things before review: no sensitive fields in responses, same response for wrong email/wrong password, and every handler error response returns immediately.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- `docker compose up -d postgres` confirmed PostgreSQL was running.
+- `SERVER_PORT=18080 go run ./cmd/server` started the current source.
+- `GET /health` returned `HTTP/1.1 200 OK`.
+- Valid `POST /users/register` returned `HTTP/1.1 201 Created`.
+- Valid `POST /users/login` returned `HTTP/1.1 200 OK` without `PasswordHash`.
+- Wrong password returned `HTTP/1.1 401 Unauthorized` with `invalid email or password`.
+- Wrong email returned `HTTP/1.1 401 Unauthorized` with `invalid email or password`.
+- Missing password returned `HTTP/1.1 400 Bad Request`.
+- Whitespace-only password returned `HTTP/1.1 400 Bad Request`.
+- `GET /tasks?limit=1&offset=0` returned `HTTP/1.1 200 OK`.
+- Review record: `reviews/2026-06-24-t011-user-login.md`.

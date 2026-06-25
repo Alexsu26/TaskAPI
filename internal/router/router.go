@@ -16,6 +16,6 @@ func SetupRouter(h *handler.Handler) *gin.Engine {
 	h.RegisterUpdateTaskRoutes(r)
 	h.RegisterDeleteTaskRoutes(r)
 	h.RegisterCreateUserRoutes(r)
-
+	h.RegisterUserLoginRoutes(r)
 	return r
 }

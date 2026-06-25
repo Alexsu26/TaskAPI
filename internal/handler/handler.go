@@ -42,6 +42,11 @@ type CreateUserResp struct {
 	Email string
 }
 
+type UserLoginRequest struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 func handlerServiceError(ctx *gin.Context, err error) {
 	if errors.Is(err, service.ErrParaInvalid) {
 		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "invalid parameter"}))
@@ -61,6 +66,14 @@ func handlerServiceError(ctx *gin.Context, err error) {
 	}
 	if errors.Is(err, service.ErrParaMiss) {
 		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "missing parameter"}))
+		return
+	}
+	if errors.Is(err, service.ErrInvalidCredentials) {
+		ctx.JSON(http.StatusUnauthorized, FailResp(map[string]any{"message": "invalid email or password"}))
+		return
+	}
+	if errors.Is(err, service.ErrPasswordInvalid) {
+		ctx.JSON(http.StatusUnauthorized, FailResp(map[string]any{"message": "invalid email or password"}))
 		return
 	}
 	ctx.JSON(http.StatusInternalServerError, FailResp(map[string]any{"message": "failed to execute"}))
@@ -203,5 +216,26 @@ func (h *Handler) RegisterCreateUserRoutes(r *gin.Engine) {
 			Email: user.Email,
 		}
 		handlerSuccessResp(ctx, http.StatusCreated, map[string]any{"user": resp})
+	})
+}
+
+func (h *Handler) RegisterUserLoginRoutes(r *gin.Engine) {
+	r.POST("/users/login", func(ctx *gin.Context) {
+		var req UserLoginRequest
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			handlerCommonError(ctx, http.StatusBadRequest, "invalid request body")
+			return
+		}
+		user, err := h.userService.Login(req.Email, req.Password)
+		if err != nil {
+			handlerServiceError(ctx, err)
+			return
+		}
+		resp := &CreateUserResp{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+		}
+		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"user": resp})
 	})
 }

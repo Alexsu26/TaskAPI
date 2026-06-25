@@ -17,7 +17,10 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 	return &UserRepo{db: db}
 }
 
-var ErrUserEmailExists = errors.New("email already exists")
+var (
+	ErrUserEmailExists = errors.New("email already exists")
+	ErrUserNotFound    = errors.New("user not found")
+)
 
 func (r *UserRepo) Create(user *model.User) error {
 	// id, email, name, password_hash, create_at, update_at
@@ -37,4 +40,20 @@ func (r *UserRepo) Create(user *model.User) error {
 		return err
 	}
 	return nil
+}
+
+func (r *UserRepo) FindByEmail(email string) (*model.User, error) {
+	user := &model.User{}
+	err := r.db.QueryRow(
+		`select id, email, name, password_hash, created_at, updated_at
+		from users
+		where email = $1`, email).
+		Scan(&user.ID, &user.Email, &user.Name, &user.PasswordHash, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+	return user, nil
 }
