@@ -102,7 +102,7 @@ func (h *Handler) RegisterHealthRoutes(r *gin.Engine) {
 	})
 }
 
-func (h *Handler) RegisterTaskCreateRoutes(r *gin.Engine) {
+func (h *Handler) RegisterTaskCreateRoutes(r RouteRegister) {
 	r.POST("/tasks", func(ctx *gin.Context) {
 		var req CreateTaskRequest
 		if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -138,7 +138,7 @@ func parseListPara(ctx *gin.Context) (limit *int, offset *int, err error) {
 	return limit, offset, nil
 }
 
-func (h *Handler) RegisterTasksListRoutes(r *gin.Engine) {
+func (h *Handler) RegisterTasksListRoutes(r RouteRegister) {
 	r.GET("/tasks", func(ctx *gin.Context) {
 		limit, offset, err := parseListPara(ctx)
 		if err != nil {
@@ -154,7 +154,7 @@ func (h *Handler) RegisterTasksListRoutes(r *gin.Engine) {
 	})
 }
 
-func (h *Handler) RegisterGetTaskRoutes(r *gin.Engine) {
+func (h *Handler) RegisterGetTaskRoutes(r RouteRegister) {
 	r.GET("/tasks/:id", func(ctx *gin.Context) {
 		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {
@@ -170,7 +170,7 @@ func (h *Handler) RegisterGetTaskRoutes(r *gin.Engine) {
 	})
 }
 
-func (h *Handler) RegisterUpdateTaskRoutes(r *gin.Engine) {
+func (h *Handler) RegisterUpdateTaskRoutes(r RouteRegister) {
 	r.PUT("/tasks/:id", func(ctx *gin.Context) {
 		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {
@@ -191,7 +191,7 @@ func (h *Handler) RegisterUpdateTaskRoutes(r *gin.Engine) {
 	})
 }
 
-func (h *Handler) RegisterDeleteTaskRoutes(r *gin.Engine) {
+func (h *Handler) RegisterDeleteTaskRoutes(r RouteRegister) {
 	r.DELETE("/tasks/:id", func(ctx *gin.Context) {
 		id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 		if err != nil {

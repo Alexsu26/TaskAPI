@@ -26,6 +26,48 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-25: T013 Add Auth Middleware
+
+Task:
+
+- Implemented and reviewed JWT auth middleware for protected task routes.
+
+What went well:
+
+- Added a focused `internal/middleware` package boundary for authentication.
+- Used a Gin route group to protect `/tasks` routes while keeping `/health`, `/users/register`, and `/users/login` public.
+- Reused the existing token manager instead of duplicating JWT parsing logic.
+- Returned unified `401 Unauthorized` responses for missing, malformed, invalid, and expired tokens.
+- Stored `current_user_id` in Gin context, preparing the code for T014 current-user ownership filtering.
+
+Weak areas:
+
+- The first implementation introduced an import cycle by making `handler` import `router` for a route registration interface.
+- Needs more practice designing one-way package dependencies before adding helper interfaces.
+- The context key is currently a string literal; a shared constant would reduce typo risk in T014.
+
+Next improvement:
+
+- In T014, focus on reading `current_user_id` from Gin context and passing it through handler, service, and repository boundaries.
+- Replace the temporary hard-coded task `UserID: 1` with the authenticated user ID.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages after the import cycle was fixed.
+- `go vet ./...` produced no output.
+- `docker compose up -d postgres` confirmed PostgreSQL was running.
+- `SERVER_PORT=18080 JWT_SECRET=acceptance-secret JWT_EXPIRATION_MINUTES=60 go run ./cmd/server` started the service.
+- `GET /health` returned 200 without authentication.
+- `POST /users/register` returned 201 without authentication.
+- `POST /users/login` returned 200 and returned a JWT token.
+- `GET /tasks?limit=1&offset=0` without `Authorization` returned 401.
+- `GET /tasks?limit=1&offset=0` with malformed `Authorization` returned 401.
+- `GET /tasks?limit=1&offset=0` with an invalid token returned 401.
+- `GET /tasks?limit=1&offset=0` with an expired signed token returned 401.
+- `GET /tasks?limit=1&offset=0` with a valid token returned 200.
+- Review record: `reviews/2026-06-25-t013-auth-middleware.md`.
+
 ### 2026-06-25: T012 Implement JWT Generation And Parsing
 
 Task:

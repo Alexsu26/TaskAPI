@@ -113,54 +113,21 @@ Summary:
 - Updated successful login responses to include both the user DTO and JWT token without exposing `PasswordHash`.
 - Verified `/health`, task listing, registration success, login success with token, and wrong-password login behavior.
 
-## Active Task
-
 ### T013: Add Auth Middleware
+Status: Completed and verified on 2026-06-25.
 
-Objective:
+Summary:
 
-Protect private routes with JWT middleware.
+- Added an `internal/middleware` auth middleware boundary.
+- Read the `Authorization` header and parsed `Bearer <token>` values.
+- Validated JWTs through the existing `auth.TokenManager`.
+- Returned unified `401 Unauthorized` responses for missing, malformed, invalid, and expired tokens.
+- Stored the authenticated user ID in Gin context as `current_user_id` for later use.
+- Protected task routes through a Gin route group while keeping `/health`, `/users/register`, and `/users/login` public.
+- Fixed the initial import-cycle issue by keeping the route registration helper type out of the router package dependency path.
+- Verified `gofmt`, `go test ./...`, `go vet ./...`, and runtime auth middleware behavior.
 
-Learner should implement:
-
-- middleware that reads the `Authorization` header
-- `Bearer <token>` parsing
-- JWT validation through the existing token manager
-- current user ID storage in Gin context for later service use
-- clear `401 Unauthorized` responses for missing, malformed, invalid, or expired tokens
-
-Agent may provide:
-
-- middleware structure guidance
-- Gin context usage guidance
-- auth error mapping review
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- change repository SQL ownership filtering yet
-- implement current-user task ownership yet
-
-Acceptance Criteria:
-
-- Requests without `Authorization` are rejected for protected routes.
-- Requests with malformed `Authorization` are rejected.
-- Requests with invalid or expired JWTs are rejected.
-- Requests with a valid JWT can pass through middleware.
-- The middleware stores current user ID in request context.
-- `go test ./...` still passes.
-- Existing `/health`, user registration, and user login endpoints still work.
-- Do not yet restrict task rows by current user; that belongs to T014.
-
-Skills Practiced:
-
-- middleware
-- request context
-- authorization
-- JWT
-
-## Upcoming Tasks
+## Active Task
 
 ### T014: Restrict Tasks To The Current User
 
@@ -168,8 +135,60 @@ Objective:
 
 Ensure users can only access their own tasks.
 
+Learner should implement:
+
+- read the current user ID from Gin context in task handlers
+- pass the current user ID from handler to task service methods
+- pass the current user ID from service to repository methods
+- filter task create/list/detail/update/delete operations by authenticated user
+- remove the temporary hard-coded task `UserID: 1`
+- return `404 Not Found` when a task exists but does not belong to the current user
+
+Agent may provide:
+
+- handler/service/repository boundary guidance
+- SQL filtering guidance
+- current-user context retrieval examples
+- authorization review
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement the full task ownership flow unless explicitly asked
+- add role-based permission systems
+- add organization/team ownership
+- add tests beyond focused examples unless requested
+
+Acceptance Criteria:
+
+- Creating a task stores the authenticated user's ID instead of the temporary hard-coded user ID.
+- Listing tasks returns only tasks owned by the authenticated user.
+- Getting task detail returns the task only when it belongs to the authenticated user.
+- Updating a task only updates tasks owned by the authenticated user.
+- Deleting a task only deletes tasks owned by the authenticated user.
+- Accessing another user's task returns `404 Not Found` instead of exposing its existence.
+- Public `/health`, user registration, and user login endpoints still work.
+- Protected task routes still reject unauthenticated requests.
+- `go test ./...` still passes.
+
 Skills Practiced:
 
 - authorization
+- request context
 - SQL filtering
 - service-layer validation
+
+## Upcoming Tasks
+
+### T015: Add Basic Tests
+
+Objective:
+
+Add tests for the most important service or handler behavior.
+
+Skills Practiced:
+
+- Go testing
+- test data setup
+- behavior verification
