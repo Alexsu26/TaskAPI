@@ -10,7 +10,7 @@ Stage 1: Go Task API
 
 ## Status
 
-T012 completed and verified
+T013 completed and verified
 
 ## Completed
 
@@ -30,7 +30,7 @@ T012 completed and verified
 - [x] Added password hashing
 - [x] Added login
 - [x] Added JWT generation and parsing
-- [ ] Added JWT middleware
+- [x] Added JWT middleware
 - [ ] Added basic tests
 - [ ] Added Dockerfile
 - [x] Added Docker Compose
@@ -42,7 +42,7 @@ None
 
 ## Next Action
 
-Start Task `T013`: add JWT auth middleware.
+Start Task `T014`: restrict tasks to the current user.
 
 ## Last Updated
 

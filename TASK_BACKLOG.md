@@ -231,7 +231,7 @@ Skills:
 
 ### T013: Add Auth Middleware
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -245,7 +245,7 @@ Skills:
 
 ### T014: Restrict Tasks To The Current User
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

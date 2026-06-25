@@ -42,7 +42,7 @@ func run() error {
 	userRepo := repository.NewUserRepo(db)
 	userService := service.NewUserService(userRepo, tokenManager)
 	handler := handler.NewHandler(taskService, userService)
-	r := router.SetupRouter(handler)
+	r := router.SetupRouter(handler, tokenManager)
 
 	addr := ":" + cfg.Server.Port
 	if err := r.Run(addr); err != nil {

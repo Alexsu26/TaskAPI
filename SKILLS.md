@@ -12,6 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
+- 2026-06-25 T013 practiced Gin auth middleware and request context. Learner added an `internal/middleware` auth boundary, protected task routes through a Gin route group, parsed `Authorization: Bearer <token>`, validated JWTs with the existing token manager, returned unified HTTP 401 responses for missing, malformed, invalid, and expired tokens, and stored `current_user_id` in Gin context. Review first caught an import-cycle issue between `handler` and `router`; learner fixed it by moving the route registration helper type out of the router dependency path. Verification passed `gofmt`, `go test ./...`, `go vet ./...`, and runtime checks for public routes, missing/malformed/invalid/expired token rejection, and valid-token task access. Middleware is now `[x]`; authentication remains `[~]` until T014 current-user task ownership is complete.
 - 2026-06-25 T012 practiced JWT generation and parsing. Learner added `JWT_SECRET` and `JWT_EXPIRATION_MINUTES` configuration, introduced an `internal/auth` token manager, generated `HS256` JWTs with `user_id`, `exp`, and `iat` claims, validated signing method, signature, expiration, and positive user ID during parsing, injected token configuration through `main` into the user service, and returned a token from successful login without exposing `PasswordHash`. Review verified `gofmt`, `go test ./...`, `go vet ./...`, and runtime checks for `/health`, registration, login token response, wrong-password login, and task listing. JWT is now `[x]`; authentication remains `[~]` until middleware and current-user authorization are complete.
 - 2026-06-24 T011 practiced user login and password verification. Learner added `POST /users/login`, preserved handler/service/repository boundaries, added email lookup with `sql.ErrNoRows` mapped to a repository not-found error, verified passwords with `bcrypt.CompareHashAndPassword`, unified wrong-email and wrong-password responses as HTTP 401 without revealing which field was wrong, and kept `PasswordHash` out of the login response. Review verified `gofmt`, `go test ./...`, `go vet ./...`, and runtime checks for login success, wrong password, wrong email, missing password, whitespace-only password, `/health`, and task listing. Authentication remains `[~]` until JWT generation, middleware, and current-user task ownership are complete.
 - 2026-06-24 T010 practiced the first auth workflow with user registration and password hashing. Learner added `POST /users/register`, wired handler/service/repository boundaries, hashed passwords with bcrypt, handled duplicate email with PostgreSQL unique violation code `23505` mapped to HTTP 409, returned a DTO without `PasswordHash`, and fixed a double-response bug caused by a missing `return` after an error response. Review verified `gofmt`, `go test ./...`, `go vet ./...`, and runtime checks for registration success, duplicate email, missing password, whitespace-only fields, `/health`, and task listing.
@@ -27,7 +28,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [x] responsibility separation
 - [ ] goroutine
 - [ ] channel
-- [ ] `context`
+- [~] `context`
 - [ ] `net/http`
 - [x] Gin
 - [ ] GORM or `sqlc`
@@ -37,7 +38,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [~] Docker
 - [ ] testing
 - [ ] logging
-- [ ] middleware
+- [x] middleware
 - [ ] graceful shutdown
 
 ## Python Required Skills
