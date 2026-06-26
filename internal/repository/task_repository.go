@@ -25,12 +25,13 @@ func (r *TaskRepo) Create(task *model.Task) error {
 	return err
 }
 
-func (r *TaskRepo) List(limit, offset int) ([]*model.Task, error) {
+func (r *TaskRepo) List(userID int64, limit, offset int) ([]*model.Task, error) {
 	rows, err := r.db.Query(
 		`select id, user_id, title, description, status, created_at, updated_at
 		from tasks
+		where user_id = $3
 		order by updated_at DESC, id DESC
-		limit $1 offset $2`, limit, offset)
+		limit $1 offset $2`, limit, offset, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -59,12 +60,12 @@ func (r *TaskRepo) List(limit, offset int) ([]*model.Task, error) {
 	return tasks, nil
 }
 
-func (r *TaskRepo) GetByID(id int64) (task *model.Task, err error) {
+func (r *TaskRepo) GetByID(userID, id int64) (task *model.Task, err error) {
 	task = &model.Task{}
 	err = r.db.QueryRow(
 		`select id, user_id, title, description, status, created_at, updated_at
 		from tasks
-		where id = $1`, id).Scan(&task.ID, &task.UserID, &task.Title, &task.Description, &task.Status, &task.CreatedAt, &task.UpdatedAt)
+		where id = $1 and user_id = $2`, id, userID).Scan(&task.ID, &task.UserID, &task.Title, &task.Description, &task.Status, &task.CreatedAt, &task.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrTaskNotFound
@@ -77,8 +78,8 @@ func (r *TaskRepo) GetByID(id int64) (task *model.Task, err error) {
 func (r *TaskRepo) Update(task *model.Task) error {
 	err := r.db.QueryRow(
 		`update tasks set title = $2, description = $3, status = $4, updated_at = now()
-		where id = $1
-		returning id, user_id, title, description, status, created_at, updated_at`, task.ID, task.Title, task.Description, task.Status).
+		where id = $1 and user_id = $5
+		returning id, user_id, title, description, status, created_at, updated_at`, task.ID, task.Title, task.Description, task.Status, task.UserID).
 		Scan(&task.ID, &task.UserID, &task.Title, &task.Description, &task.Status, &task.CreatedAt, &task.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -89,9 +90,9 @@ func (r *TaskRepo) Update(task *model.Task) error {
 	return nil
 }
 
-func (r *TaskRepo) Delete(id int64) error {
+func (r *TaskRepo) Delete(userID, id int64) error {
 	result, err := r.db.Exec(
-		`delete from tasks where id = $1`, id)
+		`delete from tasks where id = $1 and user_id = $2`, id, userID)
 	if err != nil {
 		return err
 	}

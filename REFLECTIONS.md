@@ -26,6 +26,46 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-26: T014 Restrict Tasks To The Current User
+
+Task:
+
+- Implemented and reviewed current-user ownership filtering for task create/list/detail/update/delete.
+
+What went well:
+
+- Used the `current_user_id` value created by auth middleware instead of inventing a second authentication path.
+- Passed `userID` explicitly through handler, service, and repository boundaries.
+- Removed the temporary hard-coded task `UserID: 1`.
+- Added SQL filters so list/detail/update/delete operate only on tasks owned by the authenticated user.
+- Preserved `404 Not Found` for cross-user access, avoiding task-existence leakage.
+- Responded to review feedback with narrow fixes instead of broad rewrites.
+
+Weak areas:
+
+- The first pass missed `return` after two Gin error responses in create/list handlers.
+- The first pass used `userID` instead of `user_id` in one SQL query, which static checks did not catch.
+- Runtime authorization checks are still important because `go test` and `go vet` cannot prove SQL behavior against PostgreSQL.
+
+Next improvement:
+
+- In T015, add focused tests for service or handler behavior so regressions like missing returns and error mapping become easier to catch.
+- Continue using two-user runtime checks whenever authorization or ownership rules change.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` produced no output.
+- `docker compose up -d postgres` confirmed PostgreSQL was running.
+- `SERVER_PORT=18080 JWT_SECRET=review-secret JWT_EXPIRATION_MINUTES=60 go run ./cmd/server` started the service.
+- `POST /tasks` with user A token returned 201 and stored user A as the task owner.
+- `GET /tasks` with user B token returned 200 with an empty task list for user A's task.
+- `GET /tasks/:id`, `PUT /tasks/:id`, and `DELETE /tasks/:id` with user B token for user A's task returned 404.
+- `PUT /tasks/:id` and `DELETE /tasks/:id` with user A token for user A's task returned 200.
+- `GET /tasks` without a token returned 401.
+- Review record: `reviews/2026-06-26-t014-restrict-tasks-to-current-user.md`.
+
 ### 2026-06-25: T013 Add Auth Middleware
 
 Task:

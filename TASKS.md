@@ -127,68 +127,79 @@ Summary:
 - Fixed the initial import-cycle issue by keeping the route registration helper type out of the router package dependency path.
 - Verified `gofmt`, `go test ./...`, `go vet ./...`, and runtime auth middleware behavior.
 
-## Active Task
-
 ### T014: Restrict Tasks To The Current User
+Status: Completed and verified on 2026-06-26.
 
-Objective:
+Summary:
 
-Ensure users can only access their own tasks.
+- Read the authenticated user ID from Gin context in task handlers.
+- Passed the current user ID through handler, service, and repository task methods.
+- Removed the temporary hard-coded task `UserID: 1`.
+- Stored newly created tasks under the authenticated user's ID.
+- Filtered task list, detail, update, and delete operations by `user_id`.
+- Preserved `404 Not Found` for cross-user task detail, update, and delete attempts so task existence is not exposed.
+- Fixed review findings for missing handler `return` statements after auth-context failure and an `UPDATE` SQL column typo.
+- Verified `gofmt`, `go test ./...`, `go vet ./...`, and two-user runtime ownership checks.
 
-Learner should implement:
-
-- read the current user ID from Gin context in task handlers
-- pass the current user ID from handler to task service methods
-- pass the current user ID from service to repository methods
-- filter task create/list/detail/update/delete operations by authenticated user
-- remove the temporary hard-coded task `UserID: 1`
-- return `404 Not Found` when a task exists but does not belong to the current user
-
-Agent may provide:
-
-- handler/service/repository boundary guidance
-- SQL filtering guidance
-- current-user context retrieval examples
-- authorization review
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement the full task ownership flow unless explicitly asked
-- add role-based permission systems
-- add organization/team ownership
-- add tests beyond focused examples unless requested
-
-Acceptance Criteria:
-
-- Creating a task stores the authenticated user's ID instead of the temporary hard-coded user ID.
-- Listing tasks returns only tasks owned by the authenticated user.
-- Getting task detail returns the task only when it belongs to the authenticated user.
-- Updating a task only updates tasks owned by the authenticated user.
-- Deleting a task only deletes tasks owned by the authenticated user.
-- Accessing another user's task returns `404 Not Found` instead of exposing its existence.
-- Public `/health`, user registration, and user login endpoints still work.
-- Protected task routes still reject unauthenticated requests.
-- `go test ./...` still passes.
-
-Skills Practiced:
-
-- authorization
-- request context
-- SQL filtering
-- service-layer validation
-
-## Upcoming Tasks
+## Active Task
 
 ### T015: Add Basic Tests
 
 Objective:
 
-Add tests for the most important service or handler behavior.
+Add focused tests for the most important service or handler behavior before leaving Stage 1.
+
+Learner should implement:
+
+- choose a narrow first test target, preferably service-layer behavior where dependencies are easiest to control
+- add Go test files using the standard `testing` package
+- verify validation and error-mapping behavior for at least one important workflow
+- keep tests deterministic and runnable with `go test ./...`
+- avoid requiring a live HTTP server unless handler tests are explicitly chosen
+- keep database-dependent tests out of scope unless a clear setup/cleanup strategy is added
+
+Agent may provide:
+
+- testing target selection guidance
+- table-driven test examples
+- fake or stub dependency guidance
+- handler test guidance with `httptest` if needed
+- small isolated examples
+- review after implementation
+
+Agent should not:
+
+- implement the full test suite unless explicitly asked
+- introduce a large test framework before it is needed
+- rewrite service or handler code just to make tests easier unless there is a clear design issue
+- add broad integration-test infrastructure in this task
+
+Acceptance Criteria:
+
+- At least one meaningful Go test file is added.
+- The test verifies behavior, not just that a function can be called.
+- Tests cover at least one success path and one error path.
+- The tested behavior is tied to current Stage 1 API/service logic.
+- `go test ./...` passes.
+- Existing runtime behavior is not broken.
 
 Skills Practiced:
 
 - Go testing
-- test data setup
 - behavior verification
+- dependency boundaries
+- table-driven tests
+
+## Upcoming Tasks
+
+### T016: Complete Stage 1 Documentation
+
+Objective:
+
+Add startup instructions and API examples.
+
+Skills Practiced:
+
+- API documentation
+- README writing
+- local verification
