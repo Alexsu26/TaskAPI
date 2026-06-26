@@ -23,14 +23,16 @@ var (
 	ErrTaskNotFound  = errors.New("task not found")
 )
 
-func (s *TaskService) Create(title, description string) (*model.Task, error) {
+func (s *TaskService) Create(userID int64, title, description string) (*model.Task, error) {
 	title = strings.TrimSpace(title)
 	if title == "" {
 		return nil, ErrTitleRequired
 	}
-
+	if userID <= 0 {
+		return nil, ErrParaInvalid
+	}
 	task := &model.Task{
-		UserID:      1, // 暂时固定user_id
+		UserID:      userID,
 		Title:       title,
 		Description: description,
 		Status:      "todo",
@@ -41,7 +43,7 @@ func (s *TaskService) Create(title, description string) (*model.Task, error) {
 	return task, nil
 }
 
-func (s *TaskService) List(limit, offset *int) ([]*model.Task, error) {
+func (s *TaskService) List(userID int64, limit, offset *int) ([]*model.Task, error) {
 	l := 20
 	o := 0
 	if limit != nil {
@@ -51,21 +53,21 @@ func (s *TaskService) List(limit, offset *int) ([]*model.Task, error) {
 		o = *offset
 	}
 
-	if l <= 0 || l > 100 || o < 0 {
+	if l <= 0 || l > 100 || o < 0 || userID <= 0 {
 		return nil, ErrParaInvalid
 	}
-	tasks, err := s.repo.List(l, o)
+	tasks, err := s.repo.List(userID, l, o)
 	if err != nil {
 		return nil, fmt.Errorf("list tasks error :%w", err)
 	}
 	return tasks, nil
 }
 
-func (s *TaskService) GetByID(id int64) (*model.Task, error) {
-	if id <= 0 {
+func (s *TaskService) GetByID(userID, id int64) (*model.Task, error) {
+	if id <= 0 || userID <= 0 {
 		return nil, ErrParaInvalid
 	}
-	task, err := s.repo.GetByID(id)
+	task, err := s.repo.GetByID(userID, id)
 	if err != nil {
 		if errors.Is(err, repository.ErrTaskNotFound) {
 			return nil, ErrTaskNotFound
@@ -75,8 +77,8 @@ func (s *TaskService) GetByID(id int64) (*model.Task, error) {
 	return task, nil
 }
 
-func (s *TaskService) Update(id int64, title, description, status string) (task *model.Task, err error) {
-	if id <= 0 {
+func (s *TaskService) Update(userID, id int64, title, description, status string) (task *model.Task, err error) {
+	if id <= 0 || userID <= 0 {
 		return nil, ErrParaInvalid
 	}
 	titleTrim := strings.TrimSpace(title)
@@ -85,7 +87,7 @@ func (s *TaskService) Update(id int64, title, description, status string) (task 
 	}
 	task = &model.Task{
 		ID:          id,
-		UserID:      1,
+		UserID:      userID,
 		Title:       titleTrim,
 		Description: description,
 		Status:      status,
@@ -100,11 +102,11 @@ func (s *TaskService) Update(id int64, title, description, status string) (task 
 	return task, nil
 }
 
-func (s *TaskService) Delete(id int64) error {
-	if id <= 0 {
+func (s *TaskService) Delete(userID, id int64) error {
+	if id <= 0 || userID <= 0 {
 		return ErrParaInvalid
 	}
-	err := s.repo.Delete(id)
+	err := s.repo.Delete(userID, id)
 	if err != nil {
 		if errors.Is(err, repository.ErrTaskNotFound) {
 			return ErrTaskNotFound

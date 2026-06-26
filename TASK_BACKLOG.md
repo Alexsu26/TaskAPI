@@ -245,7 +245,7 @@ Skills:
 
 ### T014: Restrict Tasks To The Current User
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -259,7 +259,7 @@ Skills:
 
 ### T015: Add Basic Tests
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

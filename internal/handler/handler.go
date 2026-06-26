@@ -109,7 +109,12 @@ func (h *Handler) RegisterTaskCreateRoutes(r RouteRegister) {
 			handlerCommonError(ctx, http.StatusBadRequest, "invalid request body")
 			return
 		}
-		task, err := h.taskService.Create(req.Title, req.Description)
+		userID, err := getContextUserID(ctx)
+		if err != nil {
+			handlerCommonError(ctx, http.StatusUnauthorized, "not login")
+			return
+		}
+		task, err := h.taskService.Create(userID, req.Title, req.Description)
 		if err != nil {
 			handlerServiceError(ctx, err)
 			return
@@ -145,7 +150,12 @@ func (h *Handler) RegisterTasksListRoutes(r RouteRegister) {
 			handlerCommonError(ctx, http.StatusBadRequest, "invalid request parameters")
 			return
 		}
-		tasks, err := h.taskService.List(limit, offset)
+		userID, err := getContextUserID(ctx)
+		if err != nil {
+			handlerCommonError(ctx, http.StatusUnauthorized, "not login")
+			return
+		}
+		tasks, err := h.taskService.List(userID, limit, offset)
 		if err != nil {
 			handlerServiceError(ctx, err)
 			return
@@ -161,7 +171,12 @@ func (h *Handler) RegisterGetTaskRoutes(r RouteRegister) {
 			handlerCommonError(ctx, http.StatusBadRequest, "request parameter id is invalid")
 			return
 		}
-		task, err := h.taskService.GetByID(id)
+		userID, err := getContextUserID(ctx)
+		if err != nil {
+			handlerCommonError(ctx, http.StatusUnauthorized, "not login")
+			return
+		}
+		task, err := h.taskService.GetByID(userID, id)
 		if err != nil {
 			handlerServiceError(ctx, err)
 			return
@@ -182,7 +197,12 @@ func (h *Handler) RegisterUpdateTaskRoutes(r RouteRegister) {
 			handlerCommonError(ctx, http.StatusBadRequest, "invalid request body")
 			return
 		}
-		task, err := h.taskService.Update(id, req.Title, req.Description, req.Status)
+		userID, err := getContextUserID(ctx)
+		if err != nil {
+			handlerCommonError(ctx, http.StatusUnauthorized, "not login")
+			return
+		}
+		task, err := h.taskService.Update(userID, id, req.Title, req.Description, req.Status)
 		if err != nil {
 			handlerServiceError(ctx, err)
 			return
@@ -198,7 +218,12 @@ func (h *Handler) RegisterDeleteTaskRoutes(r RouteRegister) {
 			handlerCommonError(ctx, http.StatusBadRequest, "invalid task id")
 			return
 		}
-		err = h.taskService.Delete(id)
+		userID, err := getContextUserID(ctx)
+		if err != nil {
+			handlerCommonError(ctx, http.StatusUnauthorized, "not login")
+			return
+		}
+		err = h.taskService.Delete(userID, id)
 		if err != nil {
 			handlerServiceError(ctx, err)
 			return

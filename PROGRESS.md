@@ -6,11 +6,11 @@ Stage 1: Go Task API
 
 ## Current Substage
 
-1.4 User Auth
+1.5 Testing And Documentation
 
 ## Status
 
-T013 completed and verified
+T014 completed and verified
 
 ## Completed
 
@@ -31,6 +31,7 @@ T013 completed and verified
 - [x] Added login
 - [x] Added JWT generation and parsing
 - [x] Added JWT middleware
+- [x] Restricted tasks to the current user
 - [ ] Added basic tests
 - [ ] Added Dockerfile
 - [x] Added Docker Compose
@@ -42,8 +43,8 @@ None
 
 ## Next Action
 
-Start Task `T014`: restrict tasks to the current user.
+Start Task `T015`: add basic tests.
 
 ## Last Updated
 
-2026-06-25
+2026-06-26
