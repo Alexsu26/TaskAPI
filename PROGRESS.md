@@ -10,7 +10,7 @@ Stage 1: Go Task API
 
 ## Status
 
-T014 completed and verified
+T015 completed and verified
 
 ## Completed
 
@@ -32,7 +32,7 @@ T014 completed and verified
 - [x] Added JWT generation and parsing
 - [x] Added JWT middleware
 - [x] Restricted tasks to the current user
-- [ ] Added basic tests
+- [x] Added basic tests
 - [ ] Added Dockerfile
 - [x] Added Docker Compose
 - [x] Wrote README run instructions
@@ -43,7 +43,7 @@ None
 
 ## Next Action
 
-Start Task `T015`: add basic tests.
+Start Task `T016`: complete Stage 1 documentation.
 
 ## Last Updated
 

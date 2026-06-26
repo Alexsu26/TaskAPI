@@ -259,7 +259,7 @@ Skills:
 
 ### T015: Add Basic Tests
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -273,7 +273,7 @@ Skills:
 
 ### T016: Complete Stage 1 Documentation
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 
