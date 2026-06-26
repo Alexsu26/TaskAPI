@@ -273,7 +273,7 @@ Skills:
 
 ### T016: Complete Stage 1 Documentation
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -289,7 +289,7 @@ Skills:
 
 ### T017: Add Database Migrations
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

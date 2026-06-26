@@ -26,6 +26,37 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-26: T016 Complete Stage 1 Documentation
+
+Task:
+
+- Updated and reviewed Stage 1 README startup instructions, configuration documentation, API examples, auth usage, response envelope examples, and test command documentation.
+
+What went well:
+
+- Covered the full route surface needed for Stage 1: health, registration, login, create/list/detail/update/delete task routes.
+- Matched the documented environment defaults to the current `internal/config` implementation.
+- Documented the JWT auth boundary clearly enough for protected task routes.
+- Kept README focused on local operation and API usage instead of expanding into broad architecture notes.
+- Responded to review feedback with narrow fixes that made the examples more runnable.
+
+Weak areas:
+
+- First pass included placeholder query values and Gin route syntax (`:id`) in caller-facing curl examples.
+- First pass missed one shell continuation character in the PUT example, which would break copy-paste usage.
+- Configuration wording needs precision; `DATABASE_NAME` is the PostgreSQL database name, not a table name.
+
+Next improvement:
+
+- In T017, focus on replacing ad hoc schema creation with a clear versioned migration workflow.
+- Continue checking docs and commands from a new developer's perspective: can the example be copied and run as written?
+
+Evidence:
+
+- Updated `README.md`.
+- `go test ./...` passed for all packages.
+- Review record: `reviews/2026-06-26-t016-complete-stage-1-documentation.md`.
+
 ### 2026-06-26: T015 Add Basic Tests
 
 Task:

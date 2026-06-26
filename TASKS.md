@@ -153,45 +153,58 @@ Summary:
 - Kept the test deterministic with the standard Go `testing` package and no external service dependency.
 - Verified `gofmt`, `go test ./...`, and `go vet ./...`.
 
+### T016: Complete Stage 1 Documentation
+Status: Completed and verified on 2026-06-26.
+
+Summary:
+
+- Updated `README.md` with local development startup steps.
+- Documented current environment variables and useful defaults from `internal/config`.
+- Added API examples for `/health`, registration, login, and authenticated task CRUD routes.
+- Documented JWT usage through the `Authorization: Bearer <token>` header for protected task routes.
+- Included the `go test ./...` command for running tests.
+- Fixed review findings so documented pagination, task ID, and PUT examples are runnable and consistent with current Gin routes.
+- Verified `go test ./...`.
+
 ## Active Task
 
-### T016: Complete Stage 1 Documentation
+### T017: Add Database Migrations
 
 Objective:
 
-Add startup instructions and API examples before leaving Stage 1.
+Replace ad hoc schema setup with versioned database migrations.
 
 Learner should implement:
 
-- update README startup instructions so a new developer can run the service locally
-- document required environment variables and useful defaults
-- add API examples for health, registration, login, and authenticated task routes
-- include how to run tests with `go test ./...`
-- keep examples consistent with the current unified response envelope and JWT auth flow
+- choose a simple migration approach suitable for this project
+- add initial versioned SQL migrations for the current users and tasks schema
+- update startup or local run workflow so migrations can be applied predictably
+- avoid silently changing the current API behavior while moving schema creation out of ad hoc setup
+- document the migration command or workflow
 
 Agent may provide:
 
-- documentation structure guidance
-- API example review
+- migration tool comparison and recommendation
+- current schema extraction guidance
+- migration file review
 - command verification
-- response-shape checks against the current implementation
 
 Agent should not:
 
-- invent API behavior that does not exist
-- fabricate environment values that differ from current config defaults
-- turn README into broad architecture documentation before Stage 1 is complete
+- replace the learner's migration implementation wholesale
+- introduce a large ORM or framework migration if a smaller tool fits better
+- change repository/service behavior unless it is required by the migration task
 
 Acceptance Criteria:
 
-- README includes local startup steps.
-- README explains required configuration values or defaults.
-- README includes API examples for public and authenticated routes.
-- README includes test command instructions.
-- Documented examples match current route paths, auth behavior, and response envelope.
+- Migration files exist and represent the current `users` and `tasks` schema.
+- The app no longer depends on unversioned ad hoc schema creation as the primary schema workflow.
+- A fresh local database can be prepared using the documented migration workflow.
+- Existing Stage 1 API behavior still works after migrations are applied.
+- `go test ./...` passes.
 
 Skills Practiced:
 
-- API documentation
-- README writing
+- database migrations
+- SQL schema versioning
 - local verification
