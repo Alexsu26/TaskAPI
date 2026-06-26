@@ -26,6 +26,38 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-26: T015 Add Basic Tests
+
+Task:
+
+- Added and reviewed focused unit tests for JWT token generation and parsing.
+
+What went well:
+
+- Chose a narrow target that does not require PostgreSQL or a live HTTP server.
+- Used Go's standard `testing` package without adding unnecessary framework dependencies.
+- Tested one success path: generated token can be parsed and returns the expected `user_id`.
+- Tested error paths with `errors.Is`, which matches how wrapped/sentinel errors are checked in Go.
+- Kept the test file in the same package as `internal/auth/token.go`, making the first test task simple and easy to run.
+
+Weak areas:
+
+- Testing is still new; broader service, handler, and database-dependent tests are not covered yet.
+- The tests cover invalid token and invalid user ID, but not expiration behavior or wrong signing secrets.
+
+Next improvement:
+
+- In T016, document how to run `go test ./...` alongside startup and API examples.
+- In later tasks, practice table-driven tests and test doubles after service/repository boundaries are made easier to fake.
+
+Evidence:
+
+- Added `internal/auth/token_test.go`.
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` produced no output.
+- Review record: `reviews/2026-06-26-t015-add-basic-tests.md`.
+
 ### 2026-06-26: T014 Restrict Tasks To The Current User
 
 Task:

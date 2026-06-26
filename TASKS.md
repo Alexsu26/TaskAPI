@@ -141,62 +141,54 @@ Summary:
 - Fixed review findings for missing handler `return` statements after auth-context failure and an `UPDATE` SQL column typo.
 - Verified `gofmt`, `go test ./...`, `go vet ./...`, and two-user runtime ownership checks.
 
-## Active Task
-
 ### T015: Add Basic Tests
+Status: Completed and verified on 2026-06-26.
 
-Objective:
+Summary:
 
-Add focused tests for the most important service or handler behavior before leaving Stage 1.
+- Added focused unit tests for the JWT token manager under `internal/auth`.
+- Verified token generation and parsing preserves the expected `user_id`.
+- Verified invalid user IDs return `ErrTokenInvalid`.
+- Verified malformed token parsing returns `ErrTokenInvalid`.
+- Kept the test deterministic with the standard Go `testing` package and no external service dependency.
+- Verified `gofmt`, `go test ./...`, and `go vet ./...`.
 
-Learner should implement:
-
-- choose a narrow first test target, preferably service-layer behavior where dependencies are easiest to control
-- add Go test files using the standard `testing` package
-- verify validation and error-mapping behavior for at least one important workflow
-- keep tests deterministic and runnable with `go test ./...`
-- avoid requiring a live HTTP server unless handler tests are explicitly chosen
-- keep database-dependent tests out of scope unless a clear setup/cleanup strategy is added
-
-Agent may provide:
-
-- testing target selection guidance
-- table-driven test examples
-- fake or stub dependency guidance
-- handler test guidance with `httptest` if needed
-- small isolated examples
-- review after implementation
-
-Agent should not:
-
-- implement the full test suite unless explicitly asked
-- introduce a large test framework before it is needed
-- rewrite service or handler code just to make tests easier unless there is a clear design issue
-- add broad integration-test infrastructure in this task
-
-Acceptance Criteria:
-
-- At least one meaningful Go test file is added.
-- The test verifies behavior, not just that a function can be called.
-- Tests cover at least one success path and one error path.
-- The tested behavior is tied to current Stage 1 API/service logic.
-- `go test ./...` passes.
-- Existing runtime behavior is not broken.
-
-Skills Practiced:
-
-- Go testing
-- behavior verification
-- dependency boundaries
-- table-driven tests
-
-## Upcoming Tasks
+## Active Task
 
 ### T016: Complete Stage 1 Documentation
 
 Objective:
 
-Add startup instructions and API examples.
+Add startup instructions and API examples before leaving Stage 1.
+
+Learner should implement:
+
+- update README startup instructions so a new developer can run the service locally
+- document required environment variables and useful defaults
+- add API examples for health, registration, login, and authenticated task routes
+- include how to run tests with `go test ./...`
+- keep examples consistent with the current unified response envelope and JWT auth flow
+
+Agent may provide:
+
+- documentation structure guidance
+- API example review
+- command verification
+- response-shape checks against the current implementation
+
+Agent should not:
+
+- invent API behavior that does not exist
+- fabricate environment values that differ from current config defaults
+- turn README into broad architecture documentation before Stage 1 is complete
+
+Acceptance Criteria:
+
+- README includes local startup steps.
+- README explains required configuration values or defaults.
+- README includes API examples for public and authenticated routes.
+- README includes test command instructions.
+- Documented examples match current route paths, auth behavior, and response envelope.
 
 Skills Practiced:
 
