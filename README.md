@@ -56,22 +56,145 @@ sessions/
 reviews/ if code was reviewed
 ```
 
-## Local Run Command
-init the PG:
+## Local Development
+
+### Prerequisites
+ - Go
+ - Docker / Docker Compose
+
+### Start PostgreSQL
 ```bash
 docker compose up -d
 ```
 
-start the repo:
+### Start Server
 ```bash
 go run ./cmd/server
 ```
 
-test local health:
+### Configuration
+| Env                    | Default        | Meaning                             |
+|:------------------------:|:----------------:|:-------------------------------------:|
+| SERVER_PORT            | 8080           | Port the server running             |
+| DATABASE_HOST          | localhost      | PG host, localhost for docker image |
+| DATABASE_PORT          | 5432           | PG port, 5432 for docker image      |
+| DATABASE_USER          | taskapi        | PG user                             |
+| DATABASE_PASSWORD      | taskapi        | PG password                         |
+| DATABASE_NAME          | taskapi        | PG database name                       |
+| JWT_SECRET             | dev-jwt-secret | secret to generate JWT              |
+| JWT_EXPIRATION_MINUTES | 60             | JWT expiration time, default 60 min |
+
+### Run Tests
+in the root dict
+```bash
+go test ./...
+```
+
+## API Examples
+### Health
 ```bash
 curl -i http://localhost:8080/health
 ```
 
+### Register
+```bash
+curl -i "http://localhost:8080/users/register" \
+    -H "Content-Type: application/json" \
+    -d '{"name": "name", "email": "example@ex.com", "password": "test"}'
+```
+Got Response:
+```text
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Date: Fri, 26 Jun 2026 08:23:09 GMT
+Content-Length: 80
+
+{"data":{"user":{"ID":17,"Name":"name","Email":"example@ex.com"}},"status":"ok"}
+```
+
+### Login
+```bash
+curl -i "http://localhost:8080/users/login" \
+    -H "Content-Type: application/json" \
+    -d '{"email": "example@ex.com", "password": "test"}'
+```
+this will return the JWT token
+```text
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Fri, 26 Jun 2026 08:27:05 GMT
+Content-Length: 236
+
+{"data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNywiZXhwIjoxNzgyNDY2MDI1LCJpYXQiOjE3ODI0NjI0MjV9.gnmUdxI9jE25A6GNB89x_etS1WfNIe3K5K3ceT6ekK8","user":{"ID":17,"Name":"name","Email":"example@ex.com"}},"status":"ok"}
+```
+
+above URL DO NOT required token, below DOES  
+
+### Create Task
+```bash
+curl -i "http://localhost:8080/tasks" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer your_token_here" \
+    -d '{"title": "task1", "description": "just a test task"}'
+```
+Response:
+```text
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Date: Fri, 26 Jun 2026 08:30:58 GMT
+Content-Length: 211
+
+{"data":{"task":{"ID":8,"UserID":17,"Title":"task1","Description":"just a test task","Status":"todo","CreatedAt":"2026-06-26T16:30:58.216073+08:00","UpdatedAt":"2026-06-26T16:30:58.216073+08:00"}},"status":"ok"}
+```
+### List Task
+default `limit=20`, `offset=0`, can be empty
+```bash
+curl -i "http://localhost:8080/tasks?limit=20&offset=0" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer your_token_here"
+```
+
+### Get Task
+```bash
+curl -i "http://localhost:8080/tasks/8" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer your_token_here"
+```
+
+### Update Task
+```bash
+curl -i -X PUT "http://localhost:8080/tasks/8" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer your_token_here" \
+    -d '{"title": "test2", "description": "another", "status": "doing"}'
+```
+
+### Delete Task
+```bash
+curl -i -X DELETE "http://localhost:8080/tasks/8" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer your_token_here"
+```
+
+### Response Struct
+when success, response may like this:
+```json
+{
+  "status": "ok",
+  "data": {}
+}
+```
+when fail, response may like this:
+```json
+{
+  "status": "error",
+  "error": {
+    "message": ""
+  }
+}
+```
+
+## Shut Down PG
 after servering, use
 ```bash
 docker compose down

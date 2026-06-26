@@ -2,15 +2,15 @@
 
 ## Current Stage
 
-Stage 1: Go Task API
+Stage 2: Go Engineering
 
 ## Current Substage
 
-1.5 Testing And Documentation
+2.1 Database Migration
 
 ## Status
 
-T015 completed and verified
+T016 completed and verified. Stage 1 is complete.
 
 ## Completed
 
@@ -35,7 +35,7 @@ T015 completed and verified
 - [x] Added basic tests
 - [ ] Added Dockerfile
 - [x] Added Docker Compose
-- [x] Wrote README run instructions
+- [x] Wrote README run instructions and API examples
 
 ## Current Blockers
 
@@ -43,7 +43,7 @@ None
 
 ## Next Action
 
-Start Task `T016`: complete Stage 1 documentation.
+Start Task `T017`: add database migrations.
 
 ## Last Updated
 
