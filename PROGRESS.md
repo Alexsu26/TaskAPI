@@ -10,7 +10,7 @@ Stage 2: Go Engineering
 
 ## Status
 
-T016 completed and verified. Stage 1 is complete.
+T017 completed and verified. Stage 2 database migration work has started.
 
 ## Completed
 
@@ -36,6 +36,7 @@ T016 completed and verified. Stage 1 is complete.
 - [ ] Added Dockerfile
 - [x] Added Docker Compose
 - [x] Wrote README run instructions and API examples
+- [x] Added versioned database migrations
 
 ## Current Blockers
 
@@ -43,8 +44,8 @@ None
 
 ## Next Action
 
-Start Task `T017`: add database migrations.
+Start Task `T018`: refactor DTO, model, and response boundaries.
 
 ## Last Updated
 
-2026-06-26
+2026-06-27
