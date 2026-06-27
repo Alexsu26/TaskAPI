@@ -12,6 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
+- 2026-06-27 T019 practiced structured logging, Gin middleware, and security-aware observability. Learner added an `internal/logger` package using Go's `log/slog` JSON handler, created the logger during server startup, injected it through router and handler boundaries, replaced `gin.Default()` with `gin.New()` plus custom request logging and `gin.Recovery()`, and logged startup configuration, request method/path/status/duration/client IP, and internal 500 errors. Review first found that the 500 error log used the full request URL and could include query strings; learner fixed it to `ctx.Request.URL.Path`. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and runtime checks for `/health`, unauthenticated task access, and login failure logs. Logging is now `[x]` for the current Stage 2 scope.
 - 2026-06-27 T018 practiced DTO design, responsibility separation, and API contract design. Learner moved handler DTO definitions into `internal/handler/dto.go`, introduced `UserResponse` and `TaskResponse` with JSON tags, converted task/user success responses from internal models to response DTOs, and kept `PasswordHash`, `UserID`, and model-only fields out of public API responses. Review first found a list conversion bug that added zero-value tasks and then a field-name compile error after renaming `UpdatedAt`; learner fixed both. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and runtime checks for registration, login, task creation, and task listing against a migrated temporary database. Responsibility separation and REST API response design remain `[x]`; validation basics still need deeper practice in a later task.
 - 2026-06-27 T017 practiced database migrations, SQL schema versioning, and local verification. Learner moved the current `users` and `tasks` schema out of the unversioned startup helper into `migrations/000001_create_users_and_tasks.up.sql` plus a matching down migration, removed the `database.RunMigrations` startup dependency, and documented the `migrate` CLI workflow. Review first found `tasks.user_id` incorrectly declared as `bigserial`; learner fixed it to `bigint`. Verification passed `go test ./...`, `go vet ./...`, `migrate up`, `migrate down -all`, and PostgreSQL schema inspection in an isolated temporary database. Database migrations and schema versioning are now `[x]` for the initial Stage 2 scope.
 - 2026-06-26 T016 practiced API documentation and local verification. Learner updated `README.md` with local startup steps, current configuration defaults, public route examples, authenticated task route examples using `Authorization: Bearer <token>`, response envelope examples, and `go test ./...` instructions. Review first found non-runnable examples for PUT continuation, pagination placeholders, task ID placeholders, and one database configuration wording issue; learner fixed them. Verification ran `go test ./...`. API documentation is now `[x]` for Stage 1's current scope.
@@ -43,7 +44,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [x] JWT
 - [~] Docker
 - [~] testing
-- [ ] logging
+- [x] logging
 - [x] middleware
 - [ ] graceful shutdown
 
@@ -68,7 +69,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [x] schema versioning
 - [ ] Redis
 - [x] authentication
-- [ ] logging
+- [x] logging
 - [~] testing
 - [~] Docker
 - [ ] Linux basics

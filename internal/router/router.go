@@ -1,6 +1,8 @@
 package router
 
 import (
+	"log/slog"
+
 	"taskapi/internal/auth"
 	"taskapi/internal/handler"
 	"taskapi/internal/middleware"
@@ -8,8 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(h *handler.Handler, tokenManager *auth.TokenManager) *gin.Engine {
-	r := gin.Default()
+func SetupRouter(h *handler.Handler, tokenManager *auth.TokenManager, log *slog.Logger) *gin.Engine {
+	r := gin.New()
+	r.Use(middleware.RequestLogger(log))
+	r.Use(gin.Recovery())
 
 	// 不需要auth
 	h.RegisterHealthRoutes(r)

@@ -26,6 +26,44 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-27: T019 Add Structured Logging
+
+Task:
+
+- Added structured server logs for startup, HTTP requests, and important internal error paths.
+
+What went well:
+
+- Chose Go's standard `log/slog` instead of adding an unnecessary third-party logging stack.
+- Kept logger creation in a small `internal/logger` package and injected the logger through startup into router and handler boundaries.
+- Used Gin middleware correctly with `ctx.Next()` to capture final response status and request duration.
+- Replaced `gin.Default()` with `gin.New()` plus custom request logging and `gin.Recovery()`, avoiding duplicate request logs while preserving recovery behavior.
+- Avoided logging Authorization headers, JWT tokens, passwords, password hashes, request bodies, JWT secrets, and database passwords.
+- Responded to review feedback by changing 500 error logs from the full URL to `ctx.Request.URL.Path`.
+
+Weak areas:
+
+- The logging task needed several explanation passes to clarify that logs are server-side observability output, not API input/output.
+- First error-log pass used the full request URL, which could leak query string values in future endpoints.
+
+Next improvement:
+
+- In T020, build on the logging foundation by adding request IDs and making panic recovery produce safer structured logs.
+- Continue thinking about observability fields as security-sensitive output, not just debugging convenience.
+
+Evidence:
+
+- Added `internal/logger/logger.go`.
+- Added structured startup logs in `cmd/server/main.go`.
+- Added `RequestLogger` middleware in `internal/middleware/middleware.go`.
+- Wired custom request logging through `internal/router/router.go`.
+- Added internal 500 error logging in `internal/handler/handler.go`.
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- Runtime checks verified JSON request logs for `/health`, unauthenticated `/tasks`, and failed `/users/login`.
+- Review record: `reviews/2026-06-27-t019-add-structured-logging.md`.
+
 ### 2026-06-27: T018 Refactor DTO, Model, And Response Boundaries
 
 Task:

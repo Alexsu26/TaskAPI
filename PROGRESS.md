@@ -10,7 +10,7 @@ Stage 2: Go Engineering
 
 ## Status
 
-T018 completed and verified. DTO, model, and response boundaries are clearer.
+T019 completed and verified. Structured logging is available for startup, HTTP requests, and internal server errors.
 
 ## Completed
 
@@ -38,6 +38,7 @@ T018 completed and verified. DTO, model, and response boundaries are clearer.
 - [x] Wrote README run instructions and API examples
 - [x] Added versioned database migrations
 - [x] Separated API DTOs from database models for current handler responses
+- [x] Added structured logging for startup, HTTP requests, and internal errors
 
 ## Current Blockers
 
@@ -45,7 +46,7 @@ None
 
 ## Next Action
 
-Start Task `T019`: add structured logging.
+Start Task `T020`: add request ID and panic recovery.
 
 ## Last Updated
 

@@ -1,8 +1,10 @@
 package middleware
 
 import (
+	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 
 	"taskapi/internal/auth"
 	"taskapi/internal/handler"
@@ -48,5 +50,22 @@ func AuthMiddleware(tokenManager *auth.TokenManager) gin.HandlerFunc {
 		ctx.Set("current_user_id", claims.UserID)
 		// 6. ctx.Next()
 		ctx.Next()
+	}
+}
+
+func RequestLogger(log *slog.Logger) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		start := time.Now()
+
+		ctx.Next()
+
+		duration := time.Since(start)
+
+		log.Info("http request",
+			"method", ctx.Request.Method,
+			"path", ctx.Request.URL.Path,
+			"status", ctx.Writer.Status(),
+			"duration_ms", duration.Milliseconds(),
+			"client_ip", ctx.ClientIP())
 	}
 }

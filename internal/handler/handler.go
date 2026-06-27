@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -14,13 +15,14 @@ import (
 type Handler struct {
 	taskService *service.TaskService
 	userService *service.UserService
+	log         *slog.Logger
 }
 
-func NewHandler(taskService *service.TaskService, userService *service.UserService) *Handler {
-	return &Handler{taskService: taskService, userService: userService}
+func NewHandler(taskService *service.TaskService, userService *service.UserService, log *slog.Logger) *Handler {
+	return &Handler{taskService: taskService, userService: userService, log: log}
 }
 
-func handlerServiceError(ctx *gin.Context, err error) {
+func (h *Handler) handlerServiceError(ctx *gin.Context, err error) {
 	if errors.Is(err, service.ErrParaInvalid) {
 		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "invalid parameter"}))
 		return
@@ -53,6 +55,10 @@ func handlerServiceError(ctx *gin.Context, err error) {
 		ctx.JSON(http.StatusBadRequest, FailResp(map[string]any{"message": "auth failed"}))
 		return
 	}
+	h.log.Error("internal server error",
+		"method", ctx.Request.Method,
+		"path", ctx.Request.URL.Path,
+		"error", err.Error())
 	ctx.JSON(http.StatusInternalServerError, FailResp(map[string]any{"message": "failed to execute"}))
 }
 
@@ -111,7 +117,7 @@ func (h *Handler) RegisterTaskCreateRoutes(r RouteRegister) {
 		}
 		task, err := h.taskService.Create(userID, req.Title, req.Description)
 		if err != nil {
-			handlerServiceError(ctx, err)
+			h.handlerServiceError(ctx, err)
 			return
 
 		}
@@ -153,7 +159,7 @@ func (h *Handler) RegisterTasksListRoutes(r RouteRegister) {
 		}
 		tasks, err := h.taskService.List(userID, limit, offset)
 		if err != nil {
-			handlerServiceError(ctx, err)
+			h.handlerServiceError(ctx, err)
 			return
 		}
 		tasksResp := toTasksResponse(tasks)
@@ -175,7 +181,7 @@ func (h *Handler) RegisterGetTaskRoutes(r RouteRegister) {
 		}
 		task, err := h.taskService.GetByID(userID, id)
 		if err != nil {
-			handlerServiceError(ctx, err)
+			h.handlerServiceError(ctx, err)
 			return
 		}
 		taskResp := toTaskResponse(task)
@@ -202,7 +208,7 @@ func (h *Handler) RegisterUpdateTaskRoutes(r RouteRegister) {
 		}
 		task, err := h.taskService.Update(userID, id, req.Title, req.Description, req.Status)
 		if err != nil {
-			handlerServiceError(ctx, err)
+			h.handlerServiceError(ctx, err)
 			return
 		}
 		taskResp := toTaskResponse(task)
@@ -224,7 +230,7 @@ func (h *Handler) RegisterDeleteTaskRoutes(r RouteRegister) {
 		}
 		err = h.taskService.Delete(userID, id)
 		if err != nil {
-			handlerServiceError(ctx, err)
+			h.handlerServiceError(ctx, err)
 			return
 		}
 		handlerSuccessResp(ctx, http.StatusOK, nil)
@@ -240,7 +246,7 @@ func (h *Handler) RegisterCreateUserRoutes(r *gin.Engine) {
 		}
 		user, err := h.userService.Create(req.Name, req.Email, req.Password)
 		if err != nil {
-			handlerServiceError(ctx, err)
+			h.handlerServiceError(ctx, err)
 			return
 		}
 
@@ -258,7 +264,7 @@ func (h *Handler) RegisterUserLoginRoutes(r *gin.Engine) {
 		}
 		user, token, err := h.userService.Login(req.Email, req.Password)
 		if err != nil {
-			handlerServiceError(ctx, err)
+			h.handlerServiceError(ctx, err)
 			return
 		}
 		resp := &UserLoginResp{

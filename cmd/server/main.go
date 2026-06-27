@@ -9,6 +9,7 @@ import (
 	"taskapi/internal/config"
 	"taskapi/internal/database"
 	"taskapi/internal/handler"
+	"taskapi/internal/logger"
 	"taskapi/internal/repository"
 	"taskapi/internal/router"
 	"taskapi/internal/service"
@@ -21,6 +22,7 @@ func main() {
 }
 
 func run() error {
+	log := logger.New()
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)
@@ -37,10 +39,16 @@ func run() error {
 		time.Duration(cfg.Auth.JWTExpirationMinutes)*time.Minute)
 	userRepo := repository.NewUserRepo(db)
 	userService := service.NewUserService(userRepo, tokenManager)
-	handler := handler.NewHandler(taskService, userService)
-	r := router.SetupRouter(handler, tokenManager)
+	handler := handler.NewHandler(taskService, userService, log)
+	r := router.SetupRouter(handler, tokenManager, log)
 
 	addr := ":" + cfg.Server.Port
+	log.Info("server starting",
+		"addr", addr,
+		"database_host", cfg.Database.Host,
+		"database_port", cfg.Database.Port,
+		"database_name", cfg.Database.Name,
+		"jwt_expiration_minutes", cfg.Auth.JWTExpirationMinutes)
 	if err := r.Run(addr); err != nil {
 		return fmt.Errorf("start server on %s: %w", addr, err)
 	}
