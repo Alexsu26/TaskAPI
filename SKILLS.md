@@ -12,6 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
+- 2026-06-27 T017 practiced database migrations, SQL schema versioning, and local verification. Learner moved the current `users` and `tasks` schema out of the unversioned startup helper into `migrations/000001_create_users_and_tasks.up.sql` plus a matching down migration, removed the `database.RunMigrations` startup dependency, and documented the `migrate` CLI workflow. Review first found `tasks.user_id` incorrectly declared as `bigserial`; learner fixed it to `bigint`. Verification passed `go test ./...`, `go vet ./...`, `migrate up`, `migrate down -all`, and PostgreSQL schema inspection in an isolated temporary database. Database migrations and schema versioning are now `[x]` for the initial Stage 2 scope.
 - 2026-06-26 T016 practiced API documentation and local verification. Learner updated `README.md` with local startup steps, current configuration defaults, public route examples, authenticated task route examples using `Authorization: Bearer <token>`, response envelope examples, and `go test ./...` instructions. Review first found non-runnable examples for PUT continuation, pagination placeholders, task ID placeholders, and one database configuration wording issue; learner fixed them. Verification ran `go test ./...`. API documentation is now `[x]` for Stage 1's current scope.
 - 2026-06-26 T015 practiced Go testing and behavior verification. Learner added `internal/auth/token_test.go` using the standard `testing` package, verified JWT generation plus parsing preserves `user_id`, and covered error paths for invalid user ID and malformed token parsing with `errors.Is`. Review verified the test is deterministic, does not require a live server or database, and passes `gofmt`, `go test ./...`, and `go vet ./...`. Testing is now `[~]` because this is the first reviewed unit-test coverage, with broader handler/service/integration testing still to practice.
 - 2026-06-26 T014 practiced authorization, Gin request context, and SQL ownership filtering. Learner threaded `current_user_id` from Gin handlers through task service methods into repository SQL, removed the temporary hard-coded `UserID: 1`, filtered list/detail/update/delete by `user_id`, and preserved `404 Not Found` for cross-user task access so task existence is not exposed. First review found a missing `return` after two handler auth failures and an `UPDATE` SQL typo (`userID` instead of `user_id`); learner fixed both. Verification passed `gofmt`, `go test ./...`, `go vet ./...`, and runtime checks for two-user create/list/detail/update/delete isolation plus unauthenticated rejection. Authentication is now `[x]` for Stage 1's current scope.
@@ -36,6 +37,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [x] Gin
 - [ ] GORM or `sqlc`
 - [x] PostgreSQL
+- [x] database migrations
 - [ ] Redis
 - [x] JWT
 - [~] Docker
@@ -62,6 +64,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [x] HTTP
 - [x] REST API
 - [x] SQL
+- [x] schema versioning
 - [ ] Redis
 - [x] authentication
 - [ ] logging

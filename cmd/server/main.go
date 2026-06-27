@@ -29,10 +29,6 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("init postgres db: %w", err)
 	}
-	err = database.RunMigrations(db)
-	if err != nil {
-		return fmt.Errorf("create table error: %w", err)
-	}
 	taskRepo := repository.NewTaskRepo(db)
 	taskService := service.NewTaskService(taskRepo)
 

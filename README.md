@@ -67,6 +67,18 @@ reviews/ if code was reviewed
 docker compose up -d
 ```
 
+### Run Database Migrations
+```bash
+migrate -path migrations -database "postgres://taskapi:taskapi@localhost:5432/taskapi?sslmode=disable" up
+```
+to refresh database, run:
+```bash
+docker compose down -v
+docker compose up -d
+migrate -path migrations -database "postgres://taskapi:taskapi@localhost:5432/taskapi?sslmode=disable" up
+go run ./cmd/server
+```
+
 ### Start Server
 ```bash
 go run ./cmd/server

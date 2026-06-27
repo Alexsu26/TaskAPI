@@ -289,7 +289,7 @@ Skills:
 
 ### T017: Add Database Migrations
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -303,7 +303,7 @@ Skills:
 
 ### T018: Refactor DTO, Model, And Response Boundaries
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

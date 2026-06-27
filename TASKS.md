@@ -166,45 +166,61 @@ Summary:
 - Fixed review findings so documented pagination, task ID, and PUT examples are runnable and consistent with current Gin routes.
 - Verified `go test ./...`.
 
+### T017: Add Database Migrations
+Status: Completed and verified on 2026-06-27.
+
+Summary:
+
+- Added versioned SQL migration files under `migrations/`.
+- Captured the current `users` and `tasks` schema in `000001_create_users_and_tasks.up.sql`.
+- Added a matching `down` migration that drops dependent `tasks` before `users`.
+- Removed startup-time dependence on the previous unversioned `database.RunMigrations` helper.
+- Documented the `migrate -path migrations ... up` workflow in `README.md`.
+- Fixed review finding where `tasks.user_id` was incorrectly declared as `bigserial` instead of `bigint`.
+- Verified `go test ./...`, `go vet ./...`, `migrate up`, `migrate down -all`, and the generated PostgreSQL table structure in an isolated temporary database.
+
 ## Active Task
 
-### T017: Add Database Migrations
+### T018: Refactor DTO, Model, And Response Boundaries
 
 Objective:
 
-Replace ad hoc schema setup with versioned database migrations.
+Separate request DTOs, response DTOs, and database models so API contracts are clearer and sensitive/internal fields do not leak through model structs.
 
 Learner should implement:
 
-- choose a simple migration approach suitable for this project
-- add initial versioned SQL migrations for the current users and tasks schema
-- update startup or local run workflow so migrations can be applied predictably
-- avoid silently changing the current API behavior while moving schema creation out of ad hoc setup
-- document the migration command or workflow
+- identify which current handlers still bind directly into model structs
+- introduce request DTOs for task create/update and auth inputs where appropriate
+- introduce response DTOs for task and user output where appropriate
+- preserve the existing unified response envelope
+- avoid changing route names or HTTP behavior unless the DTO boundary requires it
+- keep password hashes and internal-only fields out of API responses
 
 Agent may provide:
 
-- migration tool comparison and recommendation
-- current schema extraction guidance
-- migration file review
-- command verification
+- DTO boundary explanation
+- suggested file/package organization
+- focused examples for one request or response type
+- review of API response shape and field naming
+- verification commands and curl checks
 
 Agent should not:
 
-- replace the learner's migration implementation wholesale
-- introduce a large ORM or framework migration if a smaller tool fits better
-- change repository/service behavior unless it is required by the migration task
+- rewrite all handlers or service methods wholesale
+- introduce a validation framework before the boundary is clear
+- change database schema as part of this task unless a bug requires it
 
 Acceptance Criteria:
 
-- Migration files exist and represent the current `users` and `tasks` schema.
-- The app no longer depends on unversioned ad hoc schema creation as the primary schema workflow.
-- A fresh local database can be prepared using the documented migration workflow.
-- Existing Stage 1 API behavior still works after migrations are applied.
+- Request DTOs are separated from database models for the selected current API inputs.
+- Response DTOs prevent sensitive/internal fields such as `PasswordHash` from being exposed.
+- Task API responses have a deliberate field naming strategy instead of accidental Go struct field names.
+- Handler/service/repository responsibilities remain clear.
 - `go test ./...` passes.
 
 Skills Practiced:
 
-- database migrations
-- SQL schema versioning
-- local verification
+- DTO design
+- responsibility separation
+- API contract design
+- validation basics

@@ -26,6 +26,44 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-27: T017 Add Database Migrations
+
+Task:
+
+- Replaced startup-time ad hoc schema setup with versioned SQL migration files and documented the local migration workflow.
+
+What went well:
+
+- Chose a small migration approach that fits the current project instead of introducing an ORM or broad framework.
+- Moved migration files to the repository-level `migrations/` directory, which matches how an external CLI consumes them.
+- Removed the app startup dependency on unversioned schema creation while preserving handler, service, repository, and Gin route behavior.
+- Responded to review feedback by correcting `tasks.user_id` from an accidental `bigserial` to the intended `bigint` foreign key.
+
+Weak areas:
+
+- First migration pass changed schema semantics by making `tasks.user_id` auto-incrementing, showing that migration files need to be compared against the existing schema field by field.
+- README initially needed careful alignment between migration file location and the documented `migrate -path` command.
+
+Next improvement:
+
+- In T018, focus on API boundary clarity: separate request DTOs, response DTOs, and database models without changing route behavior unnecessarily.
+- Continue verifying structural changes with both static checks and a real local workflow, not only by reading the files.
+
+Evidence:
+
+- Added `migrations/000001_create_users_and_tasks.up.sql`.
+- Added `migrations/000001_create_users_and_tasks.down.sql`.
+- Removed `internal/database/migration.go`.
+- Updated `README.md` with the migration workflow.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- `migrate -path migrations -database "postgres://taskapi:taskapi@localhost:5432/taskapi_migration_review?sslmode=disable" up` succeeded.
+- PostgreSQL schema inspection confirmed `users`, `tasks`, `tasks.user_id bigint`, and `schema_migrations version=1 dirty=false`.
+- `migrate ... down -all` succeeded.
+- `SERVER_PORT=18080 DATABASE_NAME=taskapi_migration_review go run ./cmd/server` started successfully against a migrated temporary database.
+- Runtime checks against the migrated temporary database verified `/health`, user registration, login, and authenticated task creation.
+- Review record: `reviews/2026-06-27-t017-add-database-migrations.md`.
+
 ### 2026-06-26: T016 Complete Stage 1 Documentation
 
 Task:
