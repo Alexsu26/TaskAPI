@@ -6,11 +6,11 @@ Stage 2: Go Engineering
 
 ## Current Substage
 
-2.1 Database Migration
+2.3 Logging And Observability Basics
 
 ## Status
 
-T017 completed and verified. Stage 2 database migration work has started.
+T018 completed and verified. DTO, model, and response boundaries are clearer.
 
 ## Completed
 
@@ -37,6 +37,7 @@ T017 completed and verified. Stage 2 database migration work has started.
 - [x] Added Docker Compose
 - [x] Wrote README run instructions and API examples
 - [x] Added versioned database migrations
+- [x] Separated API DTOs from database models for current handler responses
 
 ## Current Blockers
 
@@ -44,7 +45,7 @@ None
 
 ## Next Action
 
-Start Task `T018`: refactor DTO, model, and response boundaries.
+Start Task `T019`: add structured logging.
 
 ## Last Updated
 

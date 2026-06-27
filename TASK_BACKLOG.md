@@ -150,7 +150,7 @@ Objective:
 
 ### IMP-002: Add JSON Tags To Task Model Or Introduce DTO Layer
 
-Status: `[ ]`
+Status: `[x]`
 
 Objective:
 
@@ -303,7 +303,7 @@ Skills:
 
 ### T018: Refactor DTO, Model, And Response Boundaries
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -317,7 +317,7 @@ Skills:
 
 ### T019: Add Structured Logging
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

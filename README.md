@@ -121,7 +121,7 @@ Content-Type: application/json; charset=utf-8
 Date: Fri, 26 Jun 2026 08:23:09 GMT
 Content-Length: 80
 
-{"data":{"user":{"ID":17,"Name":"name","Email":"example@ex.com"}},"status":"ok"}
+{"data":{"user":{"id":17,"name":"name","email":"example@ex.com"}},"status":"ok"}
 ```
 
 ### Login
@@ -137,7 +137,7 @@ Content-Type: application/json; charset=utf-8
 Date: Fri, 26 Jun 2026 08:27:05 GMT
 Content-Length: 236
 
-{"data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNywiZXhwIjoxNzgyNDY2MDI1LCJpYXQiOjE3ODI0NjI0MjV9.gnmUdxI9jE25A6GNB89x_etS1WfNIe3K5K3ceT6ekK8","user":{"ID":17,"Name":"name","Email":"example@ex.com"}},"status":"ok"}
+{"data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNywiZXhwIjoxNzgyNDY2MDI1LCJpYXQiOjE3ODI0NjI0MjV9.gnmUdxI9jE25A6GNB89x_etS1WfNIe3K5K3ceT6ekK8","user":{"id":17,"name":"name","email":"example@ex.com"}},"status":"ok"}
 ```
 
 above URL DO NOT required token, below DOES  
@@ -154,9 +154,9 @@ Response:
 HTTP/1.1 201 Created
 Content-Type: application/json; charset=utf-8
 Date: Fri, 26 Jun 2026 08:30:58 GMT
-Content-Length: 211
+Content-Length: 202
 
-{"data":{"task":{"ID":8,"UserID":17,"Title":"task1","Description":"just a test task","Status":"todo","CreatedAt":"2026-06-26T16:30:58.216073+08:00","UpdatedAt":"2026-06-26T16:30:58.216073+08:00"}},"status":"ok"}
+{"data":{"task":{"id":8,"title":"task1","description":"just a test task","status":"todo","created_at":"2026-06-26T16:30:58.216073+08:00","updated_at":"2026-06-26T16:30:58.216073+08:00"}},"status":"ok"}
 ```
 ### List Task
 default `limit=20`, `offset=0`, can be empty

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"taskapi/internal/model"
 	"taskapi/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -17,39 +18,6 @@ type Handler struct {
 
 func NewHandler(taskService *service.TaskService, userService *service.UserService) *Handler {
 	return &Handler{taskService: taskService, userService: userService}
-}
-
-type CreateTaskRequest struct {
-	Title       string `json:"title" binding:"required"`
-	Description string `json:"description"`
-}
-
-type UpdateTaskRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-}
-
-type CreateUserRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type UserLoginRequest struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type UserDTO struct {
-	ID    int64
-	Name  string
-	Email string
-}
-
-type UserLoginResp struct {
-	User  UserDTO
-	Token string
 }
 
 func handlerServiceError(ctx *gin.Context, err error) {
@@ -96,6 +64,33 @@ func handlerSuccessResp(ctx *gin.Context, statusCode int, data map[string]any) {
 	ctx.JSON(statusCode, SuccessResp(data))
 }
 
+func toTaskResponse(task *model.Task) TaskResponse {
+	return TaskResponse{
+		ID:          task.ID,
+		Title:       task.Title,
+		Description: task.Description,
+		Status:      task.Status,
+		CreatedAt:   task.CreatedAt,
+		UpdatedAt:   task.UpdatedAt,
+	}
+}
+
+func toTasksResponse(tasks []*model.Task) []TaskResponse {
+	resp := make([]TaskResponse, 0, len(tasks))
+	for _, task := range tasks {
+		resp = append(resp, toTaskResponse(task))
+	}
+	return resp
+}
+
+func toUserResponse(user *model.User) UserResponse {
+	return UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+}
+
 func (h *Handler) RegisterHealthRoutes(r *gin.Engine) {
 	r.GET("/health", func(ctx *gin.Context) {
 		handlerSuccessResp(ctx, http.StatusOK, nil)
@@ -120,7 +115,8 @@ func (h *Handler) RegisterTaskCreateRoutes(r RouteRegister) {
 			return
 
 		}
-		handlerSuccessResp(ctx, http.StatusCreated, map[string]any{"task": task})
+		taskResp := toTaskResponse(task)
+		handlerSuccessResp(ctx, http.StatusCreated, map[string]any{"task": taskResp})
 	})
 }
 
@@ -160,7 +156,8 @@ func (h *Handler) RegisterTasksListRoutes(r RouteRegister) {
 			handlerServiceError(ctx, err)
 			return
 		}
-		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"tasks": tasks})
+		tasksResp := toTasksResponse(tasks)
+		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"tasks": tasksResp})
 	})
 }
 
@@ -181,7 +178,8 @@ func (h *Handler) RegisterGetTaskRoutes(r RouteRegister) {
 			handlerServiceError(ctx, err)
 			return
 		}
-		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"task": task})
+		taskResp := toTaskResponse(task)
+		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"task": taskResp})
 	})
 }
 
@@ -207,7 +205,8 @@ func (h *Handler) RegisterUpdateTaskRoutes(r RouteRegister) {
 			handlerServiceError(ctx, err)
 			return
 		}
-		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"task": task})
+		taskResp := toTaskResponse(task)
+		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"task": taskResp})
 	})
 }
 
@@ -245,11 +244,7 @@ func (h *Handler) RegisterCreateUserRoutes(r *gin.Engine) {
 			return
 		}
 
-		resp := UserDTO{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
-		}
+		resp := toUserResponse(user)
 		handlerSuccessResp(ctx, http.StatusCreated, map[string]any{"user": resp})
 	})
 }
@@ -267,11 +262,7 @@ func (h *Handler) RegisterUserLoginRoutes(r *gin.Engine) {
 			return
 		}
 		resp := &UserLoginResp{
-			User: UserDTO{
-				ID:    user.ID,
-				Name:  user.Name,
-				Email: user.Email,
-			},
+			User:  toUserResponse(user),
 			Token: token,
 		}
 		handlerSuccessResp(ctx, http.StatusOK, map[string]any{"user": resp.User, "token": resp.Token})
