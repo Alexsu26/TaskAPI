@@ -317,7 +317,7 @@ Skills:
 
 ### T019: Add Structured Logging
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -330,7 +330,7 @@ Skills:
 
 ### T020: Add Request ID And Panic Recovery
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 
