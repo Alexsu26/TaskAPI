@@ -179,48 +179,63 @@ Summary:
 - Fixed review finding where `tasks.user_id` was incorrectly declared as `bigserial` instead of `bigint`.
 - Verified `go test ./...`, `go vet ./...`, `migrate up`, `migrate down -all`, and the generated PostgreSQL table structure in an isolated temporary database.
 
+### T018: Refactor DTO, Model, And Response Boundaries
+Status: Completed and verified on 2026-06-27.
+
+Summary:
+
+- Moved handler request and response DTO definitions into `internal/handler/dto.go`.
+- Added explicit user and task response DTOs with JSON tags for stable API field names.
+- Converted task create, list, detail, and update responses from `model.Task` to `TaskResponse`.
+- Converted user registration and login responses from internal user models to `UserResponse`.
+- Kept `PasswordHash`, `UserID`, and model-only fields out of public API responses.
+- Preserved existing routes, status codes, handler/service/repository responsibilities, and the unified response envelope.
+- Fixed review findings for list response slice construction and a `UpdatedAt` field-name compile error.
+- Verified `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and runtime response shapes against a migrated temporary database.
+
 ## Active Task
 
-### T018: Refactor DTO, Model, And Response Boundaries
+### T019: Add Structured Logging
 
 Objective:
 
-Separate request DTOs, response DTOs, and database models so API contracts are clearer and sensitive/internal fields do not leak through model structs.
+Add structured logs for server startup, requests, and important error paths so runtime behavior is easier to observe and debug.
 
 Learner should implement:
 
-- identify which current handlers still bind directly into model structs
-- introduce request DTOs for task create/update and auth inputs where appropriate
-- introduce response DTOs for task and user output where appropriate
-- preserve the existing unified response envelope
-- avoid changing route names or HTTP behavior unless the DTO boundary requires it
-- keep password hashes and internal-only fields out of API responses
+- choose a small structured logging approach that fits the current project
+- log server startup with address and key non-sensitive configuration
+- add request logs or Gin middleware logs with method, path, status, and duration
+- log important internal errors without exposing secrets or passwords
+- preserve existing route behavior and response bodies
+- avoid logging JWT tokens, password values, password hashes, or full request bodies
 
 Agent may provide:
 
-- DTO boundary explanation
-- suggested file/package organization
-- focused examples for one request or response type
-- review of API response shape and field naming
-- verification commands and curl checks
+- logging boundary explanation
+- package organization suggestions
+- examples of safe structured log fields
+- review of sensitive-data risks in logs
+- verification commands and runtime checks
 
 Agent should not:
 
-- rewrite all handlers or service methods wholesale
-- introduce a validation framework before the boundary is clear
-- change database schema as part of this task unless a bug requires it
+- introduce a large observability stack
+- rewrite all handlers just to add logging
+- log sensitive authentication data
+- change API response shapes as part of logging
 
 Acceptance Criteria:
 
-- Request DTOs are separated from database models for the selected current API inputs.
-- Response DTOs prevent sensitive/internal fields such as `PasswordHash` from being exposed.
-- Task API responses have a deliberate field naming strategy instead of accidental Go struct field names.
-- Handler/service/repository responsibilities remain clear.
+- Server startup emits a useful structured log.
+- HTTP requests emit useful structured logs with method, path, status, and duration.
+- Error paths log enough information for debugging without leaking secrets.
+- Existing API behavior remains unchanged.
 - `go test ./...` passes.
 
 Skills Practiced:
 
-- DTO design
-- responsibility separation
-- API contract design
-- validation basics
+- logging
+- observability basics
+- Gin middleware
+- security-aware debugging

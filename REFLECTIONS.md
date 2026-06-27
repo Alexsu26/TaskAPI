@@ -26,6 +26,41 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-27: T018 Refactor DTO, Model, And Response Boundaries
+
+Task:
+
+- Separated handler request/response DTOs from internal database models and reviewed API response shape.
+
+What went well:
+
+- Chose a focused `internal/handler/dto.go` structure without moving DTOs into repository or model packages.
+- Preserved the existing Gin route registration, `ShouldBindJSON` flow, service calls, and unified response envelope.
+- Converted user and task success responses to explicit DTOs with JSON tags.
+- Kept `PasswordHash` and task ownership internals out of public API responses.
+- Responded to review feedback with narrow fixes instead of broad rewrites.
+
+Weak areas:
+
+- First list-response conversion used `make(len)` plus `append`, which would have inserted zero-value tasks into the API response.
+- A follow-up rename left `UpdateAt` in the mapper while the DTO field was `UpdatedAt`, causing a compile error.
+- README examples needed a final publish-time synchronization after response field names changed.
+
+Next improvement:
+
+- In T019, focus on structured logging while keeping logs free of sensitive values such as tokens, passwords, and password hashes.
+- When changing API contracts, update documentation examples in the same task and compare them with runtime output.
+
+Evidence:
+
+- Added `internal/handler/dto.go`.
+- Updated task and user handlers to return response DTOs instead of internal models.
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- Runtime checks against `taskapi_t018_review` verified registration, login, authenticated task creation, and task listing with snake_case response fields and no `PasswordHash`.
+- Review record: `reviews/2026-06-27-t018-dto-model-response-boundaries.md`.
+
 ### 2026-06-27: T017 Add Database Migrations
 
 Task:
