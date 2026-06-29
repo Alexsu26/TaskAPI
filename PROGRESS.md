@@ -10,7 +10,7 @@ Stage 2: Go Engineering
 
 ## Status
 
-T019 completed and verified. Structured logging is available for startup, HTTP requests, and internal server errors.
+T020 completed and verified. Request IDs are available for request logs, internal error logs, and panic recovery logs, and panic recovery returns a safe generic 500 response.
 
 ## Completed
 
@@ -39,6 +39,7 @@ T019 completed and verified. Structured logging is available for startup, HTTP r
 - [x] Added versioned database migrations
 - [x] Separated API DTOs from database models for current handler responses
 - [x] Added structured logging for startup, HTTP requests, and internal errors
+- [x] Added request ID middleware and safe panic recovery
 
 ## Current Blockers
 
@@ -46,8 +47,8 @@ None
 
 ## Next Action
 
-Start Task `T020`: add request ID and panic recovery.
+Start Task `T021`: add service layer tests.
 
 ## Last Updated
 
-2026-06-27
+2026-06-29

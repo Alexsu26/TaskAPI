@@ -330,7 +330,7 @@ Skills:
 
 ### T020: Add Request ID And Panic Recovery
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"taskapi/internal/helper"
 	"taskapi/internal/model"
 	"taskapi/internal/service"
 
@@ -58,6 +59,7 @@ func (h *Handler) handlerServiceError(ctx *gin.Context, err error) {
 	h.log.Error("internal server error",
 		"method", ctx.Request.Method,
 		"path", ctx.Request.URL.Path,
+		"request_id", helper.GetRequestID(ctx),
 		"error", err.Error())
 	ctx.JSON(http.StatusInternalServerError, FailResp(map[string]any{"message": "failed to execute"}))
 }
