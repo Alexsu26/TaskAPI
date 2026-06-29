@@ -12,8 +12,9 @@ import (
 
 func SetupRouter(h *handler.Handler, tokenManager *auth.TokenManager, log *slog.Logger) *gin.Engine {
 	r := gin.New()
+	r.Use(middleware.RequestID())
 	r.Use(middleware.RequestLogger(log))
-	r.Use(gin.Recovery())
+	r.Use(middleware.PanicRecovery(log))
 
 	// 不需要auth
 	h.RegisterHealthRoutes(r)

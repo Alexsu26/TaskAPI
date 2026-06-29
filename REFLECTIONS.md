@@ -26,6 +26,42 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-29: T020 Add Request ID And Panic Recovery
+
+Task:
+
+- Added request ID middleware and custom panic recovery to improve request-level observability and safe failure handling.
+
+What went well:
+
+- Kept request ID and panic recovery inside middleware boundaries instead of spreading tracing code through service or repository logic.
+- Correctly stored `request_id` in Gin context and reused it in request logs and internal error logs.
+- Replaced `gin.Recovery()` with a custom recovery middleware so panic logs can include the request ID.
+- Preserved the existing unified error response shape for generic 500 responses.
+- Responded to review feedback by rejecting unsafe incoming `X-Request-ID` values and generating a UUID instead.
+
+Weak areas:
+
+- Panic recovery needed a deeper explanation before implementation, especially why `defer` and `recover()` must be paired.
+- The first request ID header pass accepted raw client input without validation, which would have allowed unsafe log values.
+
+Next improvement:
+
+- In T021, start adding service-layer tests so core business rules can be verified without a live HTTP server.
+- Continue treating logs as security-sensitive output and avoid recording tokens, passwords, request bodies, or query strings.
+
+Evidence:
+
+- Added `internal/helper/helper.go` for request ID retrieval and UUID generation.
+- Added `RequestID` and `PanicRecovery` middleware in `internal/middleware/middleware.go`.
+- Wired middleware ordering in `internal/router/router.go`.
+- Added request ID fields to request logs and internal server error logs.
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- Runtime `/health` checks verified server-generated request IDs, accepted UUID request IDs, rejected unsafe request IDs, and unchanged success response shape.
+- Review record: `reviews/2026-06-29-t020-request-id-panic-recovery.md`.
+
 ### 2026-06-27: T019 Add Structured Logging
 
 Task:
