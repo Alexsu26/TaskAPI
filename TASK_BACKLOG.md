@@ -344,7 +344,7 @@ Skills:
 
 ### T021: Add Service Layer Tests
 
-Status: `[ ]`
+Status: `[x]`
 
 Objective:
 

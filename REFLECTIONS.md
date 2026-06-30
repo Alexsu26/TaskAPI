@@ -26,6 +26,41 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-30: T021 Add Service Layer Tests
+
+Task:
+
+- Added and reviewed focused service-layer tests for `TaskService.Create`.
+
+What went well:
+
+- Correctly identified that service tests should not need Gin, HTTP routing, or a real PostgreSQL database.
+- Introduced a narrow repository interface at the service boundary so `TaskService` can be tested with a fake repository.
+- Kept the test target focused instead of trying to test all services at once.
+- Covered validation error behavior for empty title and invalid user ID.
+- Covered success-path business behavior for title trimming and default `todo` status.
+- Follow-up changes improved the tests by using `errors.Is` for sentinel errors and asserting the fake repository received the expected task.
+
+Weak areas:
+
+- The first service-test pass did not assert fake dependency interaction and used direct sentinel comparison, but both were corrected after review.
+- Fake repository methods that are not used by the current test panic, which is acceptable for this narrow test but can become noisy as coverage grows.
+
+Next improvement:
+
+- In T022, practice repository integration tests separately from service tests, with explicit PostgreSQL setup, isolated rows, and cleanup.
+- When adding more service tests, prefer table-driven cases and assert both returned values and fake dependency calls.
+
+Evidence:
+
+- Added `TaskRepository` interface in `internal/service/task_service.go`.
+- Added `internal/service/task_service_test.go`.
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- Follow-up review verified `errors.Is` assertions and fake repository task assertions, then re-ran `gofmt`, `go test ./...`, and `go vet ./...` successfully.
+- Review record: `reviews/2026-06-30-t021-add-service-layer-tests.md`.
+
 ### 2026-06-29: T020 Add Request ID And Panic Recovery
 
 Task:

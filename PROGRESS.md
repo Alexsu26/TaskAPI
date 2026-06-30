@@ -6,11 +6,11 @@ Stage 2: Go Engineering
 
 ## Current Substage
 
-2.3 Logging And Observability Basics
+2.4 Testing
 
 ## Status
 
-T020 completed and verified. Request IDs are available for request logs, internal error logs, and panic recovery logs, and panic recovery returns a safe generic 500 response.
+T021 completed and verified. Task service business rules now have focused unit tests that run without Gin or PostgreSQL.
 
 ## Completed
 
@@ -40,6 +40,7 @@ T020 completed and verified. Request IDs are available for request logs, interna
 - [x] Separated API DTOs from database models for current handler responses
 - [x] Added structured logging for startup, HTTP requests, and internal errors
 - [x] Added request ID middleware and safe panic recovery
+- [x] Added service layer tests
 
 ## Current Blockers
 
@@ -47,8 +48,8 @@ None
 
 ## Next Action
 
-Start Task `T021`: add service layer tests.
+Start Task `T022`: add repository integration tests.
 
 ## Last Updated
 
-2026-06-29
+2026-06-30

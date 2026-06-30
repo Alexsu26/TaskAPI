@@ -221,50 +221,62 @@ Summary:
 - Preserved the existing generic unified 500 response body for panic responses.
 - Verified `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and runtime request ID behavior on `/health`.
 
+### T021: Add Service Layer Tests
+Status: Completed and verified on 2026-06-30.
+
+Summary:
+
+- Added a service-layer repository interface for `TaskService` so service tests can use a fake repository instead of a real PostgreSQL-backed repository.
+- Added focused `TaskService.Create` unit tests under `internal/service`.
+- Covered validation error paths for missing title and invalid user ID.
+- Covered success-path business behavior for title trimming and default task status.
+- Kept the tests deterministic and free of Gin, HTTP server, and PostgreSQL dependencies.
+- Verified `gofmt -l cmd/server internal`, `go test ./...`, and `go vet ./...`.
+
 ## Active Task
 
-### T021: Add Service Layer Tests
+### T022: Add Repository Integration Tests
 
 Objective:
 
-Add focused tests for service-layer business rules so important behavior can be checked without starting Gin or PostgreSQL.
+Add focused repository tests that verify SQL/database behavior against a real or containerized PostgreSQL database.
 
 Learner should implement:
 
-- choose one small service package target first
-- add tests for success and error paths in that service
-- use fake or stub repository dependencies instead of a real database where practical
-- verify service errors with `errors.Is` when sentinel errors are expected
-- keep tests deterministic and runnable through `go test ./...`
-- avoid changing production behavior just to make tests pass
+- choose one small repository target first
+- create isolated test data so tests do not depend on existing local rows
+- verify one success path and one not-found or database-error behavior
+- keep setup and cleanup explicit
+- avoid testing service or handler logic in repository tests
+- document any required PostgreSQL test database setup
 
 Agent may provide:
 
-- guidance on choosing the first narrow service target
-- test case suggestions
-- examples of small fake repository implementations
-- review of test boundaries and error assertions
-- verification commands and runtime checks
+- guidance on choosing the first narrow repository target
+- test database setup suggestions
+- examples of setup/cleanup structure
+- review of SQL assertions and isolation boundaries
+- verification commands
 
 Agent should not:
 
-- rewrite service logic for the learner
-- introduce a large mocking framework before it is needed
-- convert this into handler or database integration testing
-- add broad flaky tests that depend on external services
+- rewrite repository logic for the learner
+- hide database setup requirements
+- convert this into handler or full API testing
+- add broad flaky tests that depend on existing local data
 
 Acceptance Criteria:
 
-- At least one service package has focused unit tests.
-- Tests cover at least one success path and one validation or business-error path.
+- At least one repository package has integration tests.
+- Tests verify one success path and one not-found or database-error path.
+- Tests use isolated setup data and cleanup.
 - Tests do not require a running HTTP server.
-- Tests do not require a running PostgreSQL instance unless explicitly justified.
-- Error assertions use stable sentinel errors or stable behavior, not fragile string matching.
-- `go test ./...` passes.
+- PostgreSQL test setup is documented or clearly discoverable.
+- `go test ./...` passes when the required test database is available.
 
 Skills Practiced:
 
-- Go testing
-- dependency boundaries
-- fake implementations
-- error handling
+- Go integration testing
+- PostgreSQL
+- SQL verification
+- test isolation
