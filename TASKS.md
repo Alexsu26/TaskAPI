@@ -246,48 +246,71 @@ Summary:
 - Kept tests in the repository package without starting Gin or testing service/handler logic.
 - Verified `gofmt -l cmd/server internal`, `go test ./...`, real PostgreSQL repository tests with `TEST_DATABASE_URL`, and `go vet ./...`.
 
+### T023: Add Redis
+Status: Completed and verified on 2026-06-30.
+
+Summary:
+
+- Added Redis to `docker-compose.yml` with a persistent Redis volume and local port mapping.
+- Added `REDIS_HOST` and `REDIS_PORT` configuration values with local defaults.
+- Added an `internal/cache` package with a Redis client creation boundary.
+- Used a timeout-bound Redis `Ping` during startup so connection failures are visible.
+- Kept Redis out of business logic for this first infrastructure-focused task.
+- Updated README with Redis startup, configuration, and `redis-cli ping` verification.
+- Verified `docker compose config`, Redis `PING`, PostgreSQL readiness, `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and a live `/health` check after server startup.
+
 ## Active Task
 
-### T023: Add Redis
+### T024: Implement One Redis Use Case
 
 Objective:
 
-Add Redis to the local development environment and prepare the Go service to connect to it.
+Implement one focused Redis-backed behavior now that Redis infrastructure and connection setup exist.
+
+Learner should implement one of:
+
+- simple task-list query cache
+- simple per-IP or per-user rate limiting
+- JWT/token blacklist support for a future logout flow
+
+Recommended first choice:
+
+- simple rate limiting middleware for one or more public routes, because it practices Redis TTL, counters, Gin middleware, and client error responses without changing core task CRUD data correctness.
 
 Learner should implement:
 
-- add Redis to `docker-compose.yml`
-- add Redis-related configuration values with sensible local defaults
-- create a small Redis connection boundary/package if needed
-- verify the service can connect to Redis without breaking existing PostgreSQL startup
-- document local Redis startup/configuration basics
-- keep the first step focused on infrastructure and connection, not a full Redis business feature
+- choose one Redis use case and keep it narrow
+- pass the existing Redis client into the boundary that needs it
+- use Redis commands through the `internal/cache` boundary or a small dedicated service/middleware
+- define expiration/TTL behavior explicitly
+- preserve existing API behavior outside the selected use case
+- document how to verify the behavior locally
 
 Agent may provide:
 
-- Docker Compose and configuration guidance
-- package boundary suggestions
-- small connection-check examples
+- use-case tradeoff guidance
+- Redis command explanations
+- middleware/service boundary suggestions
 - verification commands
 
 Agent should not:
 
-- implement a complete Redis-backed business feature in this task
-- introduce background workers or rate limiting yet
-- hide connection/configuration errors
+- implement multiple Redis features at once
+- introduce background workers in this task
+- rewrite existing auth/task handlers unnecessarily
 
 Acceptance Criteria:
 
-- Redis runs through Docker Compose.
-- Redis host/port configuration is available through the project config system.
-- The Go project has a clear Redis connection boundary or documented connection check.
-- Existing PostgreSQL-backed API startup still works.
+- One focused Redis-backed behavior works locally.
+- Redis keys have clear names and TTL behavior where appropriate.
+- The implementation preserves existing handler/service/repository boundaries.
+- Existing PostgreSQL-backed API behavior still works.
 - Existing tests pass.
-- README or another discoverable document explains how to start Redis locally.
+- README or another discoverable document explains how to verify the Redis behavior.
 
 Skills Practiced:
 
 - Redis
-- Docker Compose
-- configuration management
-- dependency connection boundaries
+- Gin middleware or service boundary design
+- TTL/cache/rate-limit thinking
+- behavior verification

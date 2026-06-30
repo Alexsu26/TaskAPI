@@ -10,7 +10,7 @@ Stage 2: Go Engineering
 
 ## Status
 
-T022 completed and verified. Task repository SQL behavior now has focused integration tests against PostgreSQL.
+T023 completed and verified. Redis now runs through Docker Compose, is available through configuration, and is checked during service startup.
 
 ## Completed
 
@@ -42,6 +42,7 @@ T022 completed and verified. Task repository SQL behavior now has focused integr
 - [x] Added request ID middleware and safe panic recovery
 - [x] Added service layer tests
 - [x] Added repository integration tests
+- [x] Added Redis to the local development environment
 
 ## Current Blockers
 
@@ -49,7 +50,7 @@ None
 
 ## Next Action
 
-Start Task `T023`: add Redis to the local environment.
+Start Task `T024`: implement one focused Redis-backed use case.
 
 ## Last Updated
 

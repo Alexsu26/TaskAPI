@@ -12,6 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
+- 2026-06-30 T023 practiced Redis basics, Docker Compose service setup, configuration management, and external dependency connection boundaries. Learner added a Redis service to `docker-compose.yml`, declared a Redis volume, exposed local port `6379`, added `REDIS_HOST` and `REDIS_PORT` defaults to `internal/config`, and created an `internal/cache` Redis client boundary using `github.com/redis/go-redis/v9`. Startup now pings Redis with a timeout and fails visibly if Redis is unavailable while preserving existing PostgreSQL startup and Gin routes. Initial review found missing README Redis documentation and untidied module metadata; follow-up changes fixed both. Verification passed `docker compose config`, `docker compose exec -T redis redis-cli ping`, PostgreSQL readiness, `go mod tidy -diff`, `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and a live `/health` check. Redis moves to `[~]` because infrastructure and connection are reviewed, but a practical Redis-backed business use case is still upcoming.
 - 2026-06-30 T022 practiced repository integration testing, PostgreSQL SQL verification, and test isolation. Learner added `internal/repository/task_repository_test.go` for `TaskRepo`, registered the `pgx` SQL driver in tests, opened PostgreSQL through `TEST_DATABASE_URL`, skipped integration tests when no database is configured, inserted isolated test users with database-generated IDs and unique email addresses, and cleaned up test tasks/users with `t.Cleanup`. Tests covered task create plus get success behavior and `ErrTaskNotFound` behavior without starting Gin or exercising service/handler logic. Initial review found a missing driver import, fixed-ID test data, ignored setup/cleanup SQL errors, and an incorrect cleanup column; follow-up changes fixed those issues. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `TEST_DATABASE_URL=... go test -count=1 ./internal/repository -run TestTaskRepo -v`, and `go vet ./...`. Testing remains `[~]` because handler/API tests are still upcoming.
 - 2026-06-30 T021 practiced service-layer testing, fake dependencies, and Go interface boundaries. Learner introduced a `TaskRepository` interface for `TaskService` so tests can pass a fake repository without constructing `repository.TaskRepo` or connecting to PostgreSQL. Learner added focused `TaskService.Create` unit tests covering missing title, invalid user ID, title trimming, default `todo` status, and the task passed into the fake repository. Follow-up fixes switched sentinel checks to `errors.Is` and asserted fake repository interaction. Review verified the tests stay in `internal/service`, do not start Gin, do not require PostgreSQL, avoid string-matching errors, and pass `gofmt -l cmd/server internal`, `go test ./...`, and `go vet ./...`. Testing remains `[~]` because repository and handler/API tests are still upcoming; `interface` and dependency boundaries move to `[~]` after first reviewed project use.
 - 2026-06-29 T020 practiced request context, logging correlation, Gin middleware, and panic recovery. Learner added request ID middleware that stores `request_id` in Gin context, returns `X-Request-ID`, accepts only UUID-shaped incoming request IDs, and generates a new UUID for missing or unsafe headers. Request logs and internal 500 error logs now include `request_id`. Learner replaced `gin.Recovery()` with a custom `PanicRecovery` middleware that logs `request_id`, method, path, and panic value while returning the existing generic unified 500 response. Review first found unsafe raw `X-Request-ID` acceptance; learner fixed it by validating the header. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and runtime checks for generated, accepted, and rejected request IDs on `/health`.
@@ -43,7 +44,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] GORM or `sqlc`
 - [x] PostgreSQL
 - [x] database migrations
-- [ ] Redis
+- [~] Redis
 - [x] JWT
 - [~] Docker
 - [~] testing
@@ -70,7 +71,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [x] REST API
 - [x] SQL
 - [x] schema versioning
-- [ ] Redis
+- [~] Redis
 - [x] authentication
 - [x] logging
 - [~] testing

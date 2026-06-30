@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"taskapi/internal/auth"
+	"taskapi/internal/cache"
 	"taskapi/internal/config"
 	"taskapi/internal/database"
 	"taskapi/internal/handler"
@@ -27,10 +28,21 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)
 	}
+
+	// init db
 	db, err := database.NewPostgresDB(&cfg)
 	if err != nil {
 		return fmt.Errorf("init postgres db: %w", err)
 	}
+	defer db.Close()
+
+	// init redis
+	redisClient, err := cache.NewRedisClient(&cfg)
+	if err != nil {
+		return fmt.Errorf("init redis failed: %w", err)
+	}
+	defer redisClient.Close()
+
 	taskRepo := repository.NewTaskRepo(db)
 	taskService := service.NewTaskService(taskRepo)
 
@@ -39,6 +51,8 @@ func run() error {
 		time.Duration(cfg.Auth.JWTExpirationMinutes)*time.Minute)
 	userRepo := repository.NewUserRepo(db)
 	userService := service.NewUserService(userRepo, tokenManager)
+
+	// handler
 	handler := handler.NewHandler(taskService, userService, log)
 	r := router.SetupRouter(handler, tokenManager, log)
 

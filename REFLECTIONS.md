@@ -26,6 +26,49 @@ Evidence:
 
 - Commands run, tests passed, or review files created.
 
+### 2026-06-30: T023 Add Redis
+
+Task:
+
+- Added and reviewed Redis infrastructure, configuration, connection boundary, startup check, and local documentation.
+
+What went well:
+
+- Kept the task correctly scoped to infrastructure and connection instead of jumping into caching, rate limiting, background workers, or token blacklist logic.
+- Added Redis to Docker Compose with a clear service name, local port mapping, and a declared persistent volume.
+- Added `REDIS_HOST` and `REDIS_PORT` to the existing config system with sensible local defaults.
+- Created a small `internal/cache` connection boundary and used `Ping` with a timeout so Redis startup failures are visible.
+- Preserved existing Gin routes and PostgreSQL-backed API startup behavior.
+- Follow-up changes fixed the two review blockers: Redis README documentation and untidied module metadata.
+
+Weak areas:
+
+- The first Docker Compose version referenced an undeclared `redis_data` volume.
+- The first Redis client startup pass created a client and discarded it, which made lifecycle ownership unclear.
+- README and `go.mod` cleanup were initially missed, even though both were part of the acceptance criteria.
+
+Next improvement:
+
+- In T024, implement one narrow Redis-backed use case and practice key naming, TTL behavior, and boundary design.
+- When adding a new external dependency, self-check four things before review: Compose parses, config is documented, startup fails visibly on connection error, and module metadata is tidy.
+
+Evidence:
+
+- Added Redis service and `redis_data` volume to `docker-compose.yml`.
+- Added Redis config values in `internal/config/config.go`.
+- Added Redis client boundary in `internal/cache/cache.go`.
+- Wired Redis startup check in `cmd/server/main.go`.
+- Updated Redis startup/configuration instructions in `README.md`.
+- `docker compose config` parsed successfully.
+- `docker compose exec -T redis redis-cli ping` returned `PONG`.
+- `docker compose exec -T postgres pg_isready -U taskapi -d taskapi` reported accepting connections.
+- `go mod tidy -diff` produced no diff.
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- `SERVER_PORT=18080 go run ./cmd/server` started successfully and `GET /health` returned `HTTP/1.1 200 OK`.
+- Review record: `reviews/2026-06-30-t023-add-redis.md`.
+
 ### 2026-06-30: T021 Add Service Layer Tests
 
 Task:

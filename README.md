@@ -62,9 +62,14 @@ reviews/ if code was reviewed
  - Go
  - Docker / Docker Compose
 
-### Start PostgreSQL
+### Start PostgreSQL and Redis
 ```bash
 docker compose up -d
+```
+to test redis connection, run:
+
+```bash
+docker compose exec -T redis redis-cli ping
 ```
 
 ### Run Database Migrations
@@ -92,6 +97,8 @@ go run ./cmd/server
 | DATABASE_PORT          | 5432           | PG port, 5432 for docker image      |
 | DATABASE_USER          | taskapi        | PG user                             |
 | DATABASE_PASSWORD      | taskapi        | PG password                         |
+| REDIS_HOST             | localhost      | redis host, localhost for docker image |
+| REDIS_PORT             | 6379           | redis port, 6379 for docker image   |
 | DATABASE_NAME          | taskapi        | PG database name                       |
 | JWT_SECRET             | dev-jwt-secret | secret to generate JWT              |
 | JWT_EXPIRATION_MINUTES | 60             | JWT expiration time, default 60 min |
