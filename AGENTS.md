@@ -166,15 +166,17 @@ git push -u origin <branch-name>
 gh pr create --base main --head <branch-name> --title "<title>" --body "<summary>"
 ```
 
-7. After the PR / MR is created, use GitHub CLI to approve it:
+7. After the PR / MR is created, merge it into `main` with GitHub CLI when available:
 
 ```bash
-gh pr review <pr-number-or-url> --approve
+gh pr merge <pr-number-or-url> --merge
 ```
 
-If GitHub rejects the approval, for example because the PR was created by the same account, do not pretend it was approved. Report the exact failure and continue with the remaining publish workflow.
+If the repository requires a different merge method, use the method that matches repository settings, such as `--squash` or `--rebase`, and report the method used.
 
-8. After the PR / MR creation and approval attempt, sync the local `main` branch with `origin/main` using a fast-forward-only flow:
+If GitHub rejects the merge because required checks, branch protection, conflicts, or authentication block it, do not pretend the merge succeeded. Report the exact failure and provide the PR / MR URL for manual completion.
+
+8. After the PR / MR merge, sync the local `main` branch with `origin/main` using a fast-forward-only flow:
 
 ```bash
 git fetch origin main
@@ -189,20 +191,20 @@ git rev-parse HEAD
 git rev-parse origin/main
 ```
 
-9. If `gh` is unavailable or authentication fails, do not pretend the MR was created or approved. Provide the pushed branch name and the manual PR creation URL instead.
+9. If `gh` is unavailable or authentication fails, do not pretend the MR was created or merged. Provide the pushed branch name and the manual PR creation URL instead.
 
-10. After the push, MR creation, approval attempt, and `main` sync, report:
+10. After the push, MR creation, merge attempt, and `main` sync, report:
 
 - branch name
 - commit hash
 - push result
 - PR/MR URL, or manual PR URL if automatic creation failed
-- approval result
+- merge result
 - local `main` sync result
 
 Rules:
 
 - Do not create an empty commit if there are no workspace changes.
-- Do not merge the branch into `main`.
+- Do not merge unreviewed or unaccepted task work into `main`.
 - Do not run `git reset --hard` or discard learner changes.
 - If unrelated changes are present, report them before committing and ask whether they should be included.
