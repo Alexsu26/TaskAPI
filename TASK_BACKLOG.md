@@ -358,7 +358,7 @@ Skills:
 
 ### T022: Add Repository Integration Tests
 
-Status: `[ ]`
+Status: `[x]`
 
 Objective:
 

@@ -800,3 +800,39 @@ Evidence:
 - Whitespace-only password returned `HTTP/1.1 400 Bad Request`.
 - `GET /tasks?limit=1&offset=0` returned `HTTP/1.1 200 OK`.
 - Review record: `reviews/2026-06-24-t011-user-login.md`.
+
+### 2026-06-30: T022 Add Repository Integration Tests
+
+Task:
+
+- Implemented and reviewed focused integration tests for `TaskRepo`.
+- Verified repository SQL behavior against PostgreSQL without starting Gin or exercising service/handler logic.
+- Added discoverable `TEST_DATABASE_URL` documentation for repository integration tests.
+
+What went well:
+
+- Chose a narrow repository target instead of turning the task into broad API testing.
+- Correctly used `TEST_DATABASE_URL` so repository integration tests can be skipped when no test database is configured.
+- After review, registered the `pgx` SQL driver in the test package.
+- Replaced fixed test user IDs with database-generated IDs returned by `insert ... returning id`.
+- Used unique test emails and `t.Cleanup` to keep test data isolated.
+- Checked setup and cleanup SQL errors after review feedback.
+
+Weak areas:
+
+- The first version looked like it passed under `go test ./...`, but it was skipped because `TEST_DATABASE_URL` was not set. Integration tests need an explicit real-database run during review.
+- The first cleanup statement used `users.user_id`, which does not exist. This shows why setup/cleanup SQL must check errors.
+- The first version ignored insert and cleanup errors, which could hide broken migrations, duplicate data, or incorrect SQL.
+
+Next improvement:
+
+- In T023, focus on Docker Compose and configuration boundaries for Redis before adding a Redis-backed business feature.
+- Keep verifying both default local commands and dependency-enabled commands when a task has optional external services.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `TEST_DATABASE_URL="postgres://taskapi:taskapi@localhost:5432/taskapi?sslmode=disable" go test -count=1 ./internal/repository -run TestTaskRepo -v` passed.
+- `go vet ./...` succeeded.
+- Review record: `reviews/2026-06-30-t022-repository-integration-tests.md`.

@@ -233,50 +233,61 @@ Summary:
 - Kept the tests deterministic and free of Gin, HTTP server, and PostgreSQL dependencies.
 - Verified `gofmt -l cmd/server internal`, `go test ./...`, and `go vet ./...`.
 
+### T022: Add Repository Integration Tests
+Status: Completed and verified on 2026-06-30.
+
+Summary:
+
+- Added focused repository integration tests for `TaskRepo`.
+- Opened PostgreSQL integration tests through `TEST_DATABASE_URL` and skipped them when no test database is configured.
+- Created isolated test users with database-generated IDs and unique email addresses.
+- Used cleanup hooks to delete test tasks and users after each test.
+- Covered task creation plus lookup success behavior and `ErrTaskNotFound` behavior.
+- Kept tests in the repository package without starting Gin or testing service/handler logic.
+- Verified `gofmt -l cmd/server internal`, `go test ./...`, real PostgreSQL repository tests with `TEST_DATABASE_URL`, and `go vet ./...`.
+
 ## Active Task
 
-### T022: Add Repository Integration Tests
+### T023: Add Redis
 
 Objective:
 
-Add focused repository tests that verify SQL/database behavior against a real or containerized PostgreSQL database.
+Add Redis to the local development environment and prepare the Go service to connect to it.
 
 Learner should implement:
 
-- choose one small repository target first
-- create isolated test data so tests do not depend on existing local rows
-- verify one success path and one not-found or database-error behavior
-- keep setup and cleanup explicit
-- avoid testing service or handler logic in repository tests
-- document any required PostgreSQL test database setup
+- add Redis to `docker-compose.yml`
+- add Redis-related configuration values with sensible local defaults
+- create a small Redis connection boundary/package if needed
+- verify the service can connect to Redis without breaking existing PostgreSQL startup
+- document local Redis startup/configuration basics
+- keep the first step focused on infrastructure and connection, not a full Redis business feature
 
 Agent may provide:
 
-- guidance on choosing the first narrow repository target
-- test database setup suggestions
-- examples of setup/cleanup structure
-- review of SQL assertions and isolation boundaries
+- Docker Compose and configuration guidance
+- package boundary suggestions
+- small connection-check examples
 - verification commands
 
 Agent should not:
 
-- rewrite repository logic for the learner
-- hide database setup requirements
-- convert this into handler or full API testing
-- add broad flaky tests that depend on existing local data
+- implement a complete Redis-backed business feature in this task
+- introduce background workers or rate limiting yet
+- hide connection/configuration errors
 
 Acceptance Criteria:
 
-- At least one repository package has integration tests.
-- Tests verify one success path and one not-found or database-error path.
-- Tests use isolated setup data and cleanup.
-- Tests do not require a running HTTP server.
-- PostgreSQL test setup is documented or clearly discoverable.
-- `go test ./...` passes when the required test database is available.
+- Redis runs through Docker Compose.
+- Redis host/port configuration is available through the project config system.
+- The Go project has a clear Redis connection boundary or documented connection check.
+- Existing PostgreSQL-backed API startup still works.
+- Existing tests pass.
+- README or another discoverable document explains how to start Redis locally.
 
 Skills Practiced:
 
-- Go integration testing
-- PostgreSQL
-- SQL verification
-- test isolation
+- Redis
+- Docker Compose
+- configuration management
+- dependency connection boundaries
