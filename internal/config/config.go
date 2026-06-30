@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	Redis    RedisConfig
 	Auth     AuthConfig
 }
 
@@ -23,6 +24,10 @@ type DatabaseConfig struct {
 	Name     string
 }
 
+type RedisConfig struct {
+	Host string
+	Port string
+}
 type AuthConfig struct {
 	JWTSecret            string
 	JWTExpirationMinutes int
@@ -39,6 +44,10 @@ func Load() (Config, error) {
 			User:     envOrDefault("DATABASE_USER", "taskapi"),
 			Password: envOrDefault("DATABASE_PASSWORD", "taskapi"),
 			Name:     envOrDefault("DATABASE_NAME", "taskapi"),
+		},
+		Redis: RedisConfig{
+			Host: envOrDefault("REDIS_HOST", "localhost"),
+			Port: envOrDefault("REDIS_PORT", "6379"),
 		},
 		Auth: AuthConfig{
 			JWTSecret:            envOrDefault("JWT_SECRET", "dev-jwt-secret"),

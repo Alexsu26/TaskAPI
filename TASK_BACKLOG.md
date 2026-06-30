@@ -372,7 +372,7 @@ Skills:
 
 ### T023: Add Redis
 
-Status: `[ ]`
+Status: `[x]`
 
 Objective:
 
@@ -386,7 +386,7 @@ Skills:
 
 ### T024: Implement One Redis Use Case
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 
