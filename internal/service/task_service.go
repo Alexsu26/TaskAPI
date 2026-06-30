@@ -9,11 +9,19 @@ import (
 	"taskapi/internal/repository"
 )
 
-type TaskService struct {
-	repo *repository.TaskRepo
+type TaskRepository interface {
+	Create(task *model.Task) error
+	List(userID int64, limit, offset int) ([]*model.Task, error)
+	GetByID(userID, id int64) (task *model.Task, err error)
+	Update(task *model.Task) error
+	Delete(userID, id int64) error
 }
 
-func NewTaskService(repo *repository.TaskRepo) *TaskService {
+type TaskService struct {
+	repo TaskRepository
+}
+
+func NewTaskService(repo TaskRepository) *TaskService {
 	return &TaskService{repo: repo}
 }
 
