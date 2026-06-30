@@ -102,6 +102,11 @@ in the root dict
 go test ./...
 ```
 
+Repository integration tests are skipped unless `TEST_DATABASE_URL` is set:
+```bash
+TEST_DATABASE_URL="postgres://taskapi:taskapi@localhost:5432/taskapi?sslmode=disable" go test ./internal/repository -run TestTaskRepo -count=1 -v
+```
+
 ## API Examples
 ### Health
 ```bash

@@ -6,11 +6,11 @@ Stage 2: Go Engineering
 
 ## Current Substage
 
-2.4 Testing
+2.5 Redis
 
 ## Status
 
-T021 completed and verified. Task service business rules now have focused unit tests that run without Gin or PostgreSQL.
+T022 completed and verified. Task repository SQL behavior now has focused integration tests against PostgreSQL.
 
 ## Completed
 
@@ -41,6 +41,7 @@ T021 completed and verified. Task service business rules now have focused unit t
 - [x] Added structured logging for startup, HTTP requests, and internal errors
 - [x] Added request ID middleware and safe panic recovery
 - [x] Added service layer tests
+- [x] Added repository integration tests
 
 ## Current Blockers
 
@@ -48,7 +49,7 @@ None
 
 ## Next Action
 
-Start Task `T022`: add repository integration tests.
+Start Task `T023`: add Redis to the local environment.
 
 ## Last Updated
 
