@@ -386,7 +386,7 @@ Skills:
 
 ### T024: Implement One Redis Use Case
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -400,7 +400,7 @@ Skills:
 
 ### T025: Add Background Worker Or Async Task
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 

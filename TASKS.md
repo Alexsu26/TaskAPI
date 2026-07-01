@@ -259,58 +259,67 @@ Summary:
 - Updated README with Redis startup, configuration, and `redis-cli ping` verification.
 - Verified `docker compose config`, Redis `PING`, PostgreSQL readiness, `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and a live `/health` check after server startup.
 
+### T024: Implement One Redis Use Case
+Status: Completed and verified on 2026-07-01.
+
+Summary:
+
+- Added a focused Redis-backed fixed-window rate limit for `POST /users/login`.
+- Passed the existing Redis client from `cmd/server` into the router instead of creating a second client in middleware.
+- Mounted `middleware.RateLimit` only on the login route group while keeping registration public and authenticated task routes unchanged.
+- Used a per-IP Redis key with `rate_limit:login:` prefix, `INCR` counters, and a one-minute TTL set with `EXPIRE` on the first request.
+- Returned the existing unified error envelope with `429 Too Many Requests` after more than five login attempts within the TTL window.
+- Handled Redis `INCR` and `EXPIRE` errors with explicit 500 responses instead of silently leaving broken limiter state.
+- Updated README with the login rate-limit rule.
+- Verified `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, and live Redis/runtime behavior: five login attempts returned `401`, the sixth returned `429`, and the Redis key had value `6` with TTL `60`.
+
 ## Active Task
 
-### T024: Implement One Redis Use Case
+### T025: Add Background Worker Or Async Task
 
 Objective:
 
-Implement one focused Redis-backed behavior now that Redis infrastructure and connection setup exist.
-
-Learner should implement one of:
-
-- simple task-list query cache
-- simple per-IP or per-user rate limiting
-- JWT/token blacklist support for a future logout flow
+Add a small asynchronous workflow so the project starts practicing Go concurrency before introducing heavier queue or worker infrastructure.
 
 Recommended first choice:
 
-- simple rate limiting middleware for one or more public routes, because it practices Redis TTL, counters, Gin middleware, and client error responses without changing core task CRUD data correctness.
+- a minimal in-process worker using `goroutine` and `channel`
+- keep the workflow observable and easy to verify locally
 
 Learner should implement:
 
-- choose one Redis use case and keep it narrow
-- pass the existing Redis client into the boundary that needs it
-- use Redis commands through the `internal/cache` boundary or a small dedicated service/middleware
-- define expiration/TTL behavior explicitly
-- preserve existing API behavior outside the selected use case
-- document how to verify the behavior locally
+- choose one narrow async event, such as logging a task-created event or processing a simple notification placeholder
+- define a small event struct and channel ownership boundary
+- start the worker during server startup
+- send the event from the appropriate service or handler boundary without blocking core API behavior for long
+- shut down or document the current shutdown limitation clearly if graceful shutdown is deferred to T026
+- preserve existing task/auth/database behavior
 
 Agent may provide:
 
-- use-case tradeoff guidance
-- Redis command explanations
-- middleware/service boundary suggestions
+- concurrency boundary guidance
+- goroutine/channel explanations
+- minimal event design suggestions
 - verification commands
 
 Agent should not:
 
-- implement multiple Redis features at once
-- introduce background workers in this task
-- rewrite existing auth/task handlers unnecessarily
+- introduce a full message queue yet
+- add a large worker framework
+- rewrite task CRUD flow unnecessarily
 
 Acceptance Criteria:
 
-- One focused Redis-backed behavior works locally.
-- Redis keys have clear names and TTL behavior where appropriate.
-- The implementation preserves existing handler/service/repository boundaries.
-- Existing PostgreSQL-backed API behavior still works.
+- One small async workflow runs locally.
+- The API still responds correctly when the worker is present.
+- Channel ownership and goroutine startup are understandable.
 - Existing tests pass.
-- README or another discoverable document explains how to verify the Redis behavior.
+- Runtime behavior is verifiable through logs or another simple observable result.
+- Any shutdown limitation is documented or explicitly deferred to T026.
 
 Skills Practiced:
 
-- Redis
-- Gin middleware or service boundary design
-- TTL/cache/rate-limit thinking
-- behavior verification
+- goroutine
+- channel
+- async workflow boundaries
+- runtime verification

@@ -6,11 +6,11 @@ Stage 2: Go Engineering
 
 ## Current Substage
 
-2.5 Redis
+2.6 Background Tasks
 
 ## Status
 
-T023 completed and verified. Redis now runs through Docker Compose, is available through configuration, and is checked during service startup.
+T024 completed and verified. The login route now has a focused Redis-backed fixed-window rate limit using `INCR`, `EXPIRE`, and a one-minute TTL.
 
 ## Completed
 
@@ -43,6 +43,7 @@ T023 completed and verified. Redis now runs through Docker Compose, is available
 - [x] Added service layer tests
 - [x] Added repository integration tests
 - [x] Added Redis to the local development environment
+- [x] Added one Redis-backed use case with login rate limiting
 
 ## Current Blockers
 
@@ -50,8 +51,8 @@ None
 
 ## Next Action
 
-Start Task `T024`: implement one focused Redis-backed use case.
+Start Task `T025`: add a small background worker or async task.
 
 ## Last Updated
 
-2026-06-30
+2026-07-01
