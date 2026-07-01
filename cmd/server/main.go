@@ -54,7 +54,7 @@ func run() error {
 
 	// handler
 	handler := handler.NewHandler(taskService, userService, log)
-	r := router.SetupRouter(handler, tokenManager, log)
+	r := router.SetupRouter(handler, tokenManager, log, redisClient)
 
 	addr := ":" + cfg.Server.Port
 	log.Info("server starting",

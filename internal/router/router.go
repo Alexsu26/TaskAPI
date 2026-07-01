@@ -8,9 +8,10 @@ import (
 	"taskapi/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
-func SetupRouter(h *handler.Handler, tokenManager *auth.TokenManager, log *slog.Logger) *gin.Engine {
+func SetupRouter(h *handler.Handler, tokenManager *auth.TokenManager, log *slog.Logger, redisClient *redis.Client) *gin.Engine {
 	r := gin.New()
 	r.Use(middleware.RequestID())
 	r.Use(middleware.RequestLogger(log))
@@ -19,7 +20,11 @@ func SetupRouter(h *handler.Handler, tokenManager *auth.TokenManager, log *slog.
 	// 不需要auth
 	h.RegisterHealthRoutes(r)
 	h.RegisterCreateUserRoutes(r)
-	h.RegisterUserLoginRoutes(r)
+	// 需要限流
+	rateLimitGroup := r.Group("")
+	rateLimitGroup.Use(middleware.RateLimit(redisClient))
+
+	h.RegisterUserLoginRoutes(rateLimitGroup)
 
 	// 需要auth
 	taskGroup := r.Group("")

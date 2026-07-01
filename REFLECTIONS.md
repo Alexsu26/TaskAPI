@@ -879,3 +879,43 @@ Evidence:
 - `TEST_DATABASE_URL="postgres://taskapi:taskapi@localhost:5432/taskapi?sslmode=disable" go test -count=1 ./internal/repository -run TestTaskRepo -v` passed.
 - `go vet ./...` succeeded.
 - Review record: `reviews/2026-06-30-t022-repository-integration-tests.md`.
+
+### 2026-07-01: T024 Implement One Redis Use Case
+
+Task:
+
+- Implemented and reviewed a focused Redis-backed fixed-window rate limit for `POST /users/login`.
+- Practiced Redis counters, TTL behavior, Gin middleware grouping, and runtime behavior verification.
+
+What went well:
+
+- Chose a narrow Redis use case instead of mixing rate limiting, caching, token blacklist, and background work.
+- Correctly passed the existing Redis client from startup into the router and middleware boundary.
+- Mounted the rate limiter only on login, preserving registration and authenticated task routes.
+- Used `INCR` to count per-IP login attempts and `EXPIRE` to enforce a one-minute window.
+- After review, handled the `EXPIRE` error instead of ignoring it.
+- Verified the real behavior through Redis and HTTP: five login attempts passed to auth and returned `401`, while the sixth returned `429`.
+
+Weak areas:
+
+- The first implementation ignored `Expire(...).Err()`, which could leave a key without TTL if Redis expiration failed.
+- The current fixed-window limiter is intentionally simple and does not yet address proxy-aware IP handling, configurability, or atomic `INCR` plus TTL with Lua.
+- README documents the rule, but future docs should include more copy-paste verification commands when behavior is operational.
+
+Next improvement:
+
+- In T025, start practicing Go concurrency with one small async workflow using `goroutine` and `channel`.
+- Keep the async task narrow and observable before adding Redis queues or worker frameworks.
+
+Evidence:
+
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- `docker compose ps` showed PostgreSQL and Redis running.
+- `docker compose exec -T postgres pg_isready -U taskapi -d taskapi` returned accepting connections.
+- `SERVER_PORT=18080 go run ./cmd/server` started the current source.
+- Six invalid login requests returned status sequence `401, 401, 401, 401, 401, 429`.
+- The sixth response body was `{"error":{"message":"please try again later"},"status":"error"}`.
+- Redis key `rate_limit:login:127.0.0.1` had value `6` and TTL `60`.
+- Review record: `reviews/2026-07-01-t024-redis-rate-limit.md`.

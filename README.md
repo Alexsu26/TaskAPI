@@ -151,6 +151,7 @@ Content-Length: 236
 
 {"data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNywiZXhwIjoxNzgyNDY2MDI1LCJpYXQiOjE3ODI0NjI0MjV9.gnmUdxI9jE25A6GNB89x_etS1WfNIe3K5K3ceT6ekK8","user":{"id":17,"name":"name","email":"example@ex.com"}},"status":"ok"}
 ```
+Login interface has been rate limited, 5 times login for 1 min; 6th login in one min will return 429 Too Many Requests.
 
 above URL DO NOT required token, below DOES  
 

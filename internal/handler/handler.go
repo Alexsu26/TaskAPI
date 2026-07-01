@@ -239,7 +239,7 @@ func (h *Handler) RegisterDeleteTaskRoutes(r RouteRegister) {
 	})
 }
 
-func (h *Handler) RegisterCreateUserRoutes(r *gin.Engine) {
+func (h *Handler) RegisterCreateUserRoutes(r RouteRegister) {
 	r.POST("/users/register", func(ctx *gin.Context) {
 		var req CreateUserRequest
 		if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -257,7 +257,7 @@ func (h *Handler) RegisterCreateUserRoutes(r *gin.Engine) {
 	})
 }
 
-func (h *Handler) RegisterUserLoginRoutes(r *gin.Engine) {
+func (h *Handler) RegisterUserLoginRoutes(r RouteRegister) {
 	r.POST("/users/login", func(ctx *gin.Context) {
 		var req UserLoginRequest
 		if err := ctx.ShouldBindJSON(&req); err != nil {

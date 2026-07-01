@@ -12,6 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
+- 2026-07-01 T024 practiced a focused Redis-backed business behavior by adding fixed-window login rate limiting. Learner injected the existing Redis client from startup into the router, mounted a `RateLimit` Gin middleware only on `POST /users/login`, used Redis `INCR` for per-IP counters, set a one-minute TTL with `EXPIRE` on first access, handled both increment and expiration errors, and returned the existing unified error envelope with `429 Too Many Requests` when the sixth login attempt occurs within one minute. Review verified the package boundary stayed in `internal/middleware`, router wiring did not disturb authenticated task routes, registration remained outside the rate-limit group, and README documented the login limit. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, and live Redis/runtime checks showing five `401` login failures followed by one `429`, with Redis key `rate_limit:login:127.0.0.1` holding value `6` and TTL `60`. Redis moves to `[x]` for the current Stage 2 scope; rate limiting moves to `[~]` because this is a simple fixed-window implementation and production proxy/IP and atomicity concerns remain future learning areas.
 - 2026-06-30 T023 practiced Redis basics, Docker Compose service setup, configuration management, and external dependency connection boundaries. Learner added a Redis service to `docker-compose.yml`, declared a Redis volume, exposed local port `6379`, added `REDIS_HOST` and `REDIS_PORT` defaults to `internal/config`, and created an `internal/cache` Redis client boundary using `github.com/redis/go-redis/v9`. Startup now pings Redis with a timeout and fails visibly if Redis is unavailable while preserving existing PostgreSQL startup and Gin routes. Initial review found missing README Redis documentation and untidied module metadata; follow-up changes fixed both. Verification passed `docker compose config`, `docker compose exec -T redis redis-cli ping`, PostgreSQL readiness, `go mod tidy -diff`, `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and a live `/health` check. Redis moves to `[~]` because infrastructure and connection are reviewed, but a practical Redis-backed business use case is still upcoming.
 - 2026-06-30 T022 practiced repository integration testing, PostgreSQL SQL verification, and test isolation. Learner added `internal/repository/task_repository_test.go` for `TaskRepo`, registered the `pgx` SQL driver in tests, opened PostgreSQL through `TEST_DATABASE_URL`, skipped integration tests when no database is configured, inserted isolated test users with database-generated IDs and unique email addresses, and cleaned up test tasks/users with `t.Cleanup`. Tests covered task create plus get success behavior and `ErrTaskNotFound` behavior without starting Gin or exercising service/handler logic. Initial review found a missing driver import, fixed-ID test data, ignored setup/cleanup SQL errors, and an incorrect cleanup column; follow-up changes fixed those issues. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `TEST_DATABASE_URL=... go test -count=1 ./internal/repository -run TestTaskRepo -v`, and `go vet ./...`. Testing remains `[~]` because handler/API tests are still upcoming.
 - 2026-06-30 T021 practiced service-layer testing, fake dependencies, and Go interface boundaries. Learner introduced a `TaskRepository` interface for `TaskService` so tests can pass a fake repository without constructing `repository.TaskRepo` or connecting to PostgreSQL. Learner added focused `TaskService.Create` unit tests covering missing title, invalid user ID, title trimming, default `todo` status, and the task passed into the fake repository. Follow-up fixes switched sentinel checks to `errors.Is` and asserted fake repository interaction. Review verified the tests stay in `internal/service`, do not start Gin, do not require PostgreSQL, avoid string-matching errors, and pass `gofmt -l cmd/server internal`, `go test ./...`, and `go vet ./...`. Testing remains `[~]` because repository and handler/API tests are still upcoming; `interface` and dependency boundaries move to `[~]` after first reviewed project use.
@@ -44,7 +45,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] GORM or `sqlc`
 - [x] PostgreSQL
 - [x] database migrations
-- [~] Redis
+- [x] Redis
 - [x] JWT
 - [~] Docker
 - [~] testing
@@ -71,7 +72,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [x] REST API
 - [x] SQL
 - [x] schema versioning
-- [~] Redis
+- [x] Redis
 - [x] authentication
 - [x] logging
 - [~] testing
@@ -82,7 +83,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [~] configuration management
 - [ ] timeout handling
 - [ ] retry handling
-- [ ] rate limiting
+- [~] rate limiting
 - [ ] database indexes
 - [x] API documentation
 
