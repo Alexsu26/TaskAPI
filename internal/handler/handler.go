@@ -9,6 +9,7 @@ import (
 	"taskapi/internal/helper"
 	"taskapi/internal/model"
 	"taskapi/internal/service"
+	"taskapi/internal/worker"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,10 +18,11 @@ type Handler struct {
 	taskService *service.TaskService
 	userService *service.UserService
 	log         *slog.Logger
+	worker      *worker.Worker
 }
 
-func NewHandler(taskService *service.TaskService, userService *service.UserService, log *slog.Logger) *Handler {
-	return &Handler{taskService: taskService, userService: userService, log: log}
+func NewHandler(taskService *service.TaskService, userService *service.UserService, log *slog.Logger, worker *worker.Worker) *Handler {
+	return &Handler{taskService: taskService, userService: userService, log: log, worker: worker}
 }
 
 func (h *Handler) handlerServiceError(ctx *gin.Context, err error) {
@@ -123,6 +125,13 @@ func (h *Handler) RegisterTaskCreateRoutes(r RouteRegister) {
 			return
 
 		}
+
+		// handoff worker
+		h.worker.PublishTaskCreated(worker.TaskCreatedEvent{
+			TaskID: task.ID,
+			UserID: userID,
+			Title:  task.Title,
+		})
 		taskResp := toTaskResponse(task)
 		handlerSuccessResp(ctx, http.StatusCreated, map[string]any{"task": taskResp})
 	})

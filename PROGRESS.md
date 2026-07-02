@@ -6,11 +6,11 @@ Stage 2: Go Engineering
 
 ## Current Substage
 
-2.6 Background Tasks
+Graceful Shutdown
 
 ## Status
 
-T024 completed and verified. The login route now has a focused Redis-backed fixed-window rate limit using `INCR`, `EXPIRE`, and a one-minute TTL.
+T025 completed and verified. Task creation now publishes a small in-process async event to a background worker using `goroutine` and `channel`.
 
 ## Completed
 
@@ -44,6 +44,7 @@ T024 completed and verified. The login route now has a focused Redis-backed fixe
 - [x] Added repository integration tests
 - [x] Added Redis to the local development environment
 - [x] Added one Redis-backed use case with login rate limiting
+- [x] Added a small background worker for task-created events
 
 ## Current Blockers
 
@@ -51,8 +52,8 @@ None
 
 ## Next Action
 
-Start Task `T025`: add a small background worker or async task.
+Start Task `T026`: add graceful shutdown for the HTTP server and background worker lifecycle.
 
 ## Last Updated
 
-2026-07-01
+2026-07-02

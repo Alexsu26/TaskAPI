@@ -400,7 +400,7 @@ Skills:
 
 ### T025: Add Background Worker Or Async Task
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 
@@ -414,7 +414,7 @@ Skills:
 
 ### T026: Add Graceful Shutdown
 
-Status: `[ ]`
+Status: `[~]`
 
 Objective:
 
