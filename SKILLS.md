@@ -12,6 +12,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 
 ## Recent Evidence
 
+- 2026-07-02 T026 practiced graceful shutdown and lifecycle management by replacing `r.Run(addr)` with an explicit `http.Server`, starting `ListenAndServe` in a goroutine, waiting in the main goroutine for either server startup/runtime errors or `os.Interrupt`/`SIGTERM`, and using `context.WithTimeout` with `httpServer.Shutdown(ctx)` for bounded HTTP shutdown. Learner added a `worker.New` constructor, moved the worker's completion channel behind the worker boundary, and implemented `Stop` by closing the event channel and waiting for the worker goroutine to finish draining queued events. Review first found that `Stop` only closed the channel without waiting, then found that the completion channel was exposed and `defer Stop` could close the channel on shutdown timeout; learner fixed both by adding a private `done` channel and stopping the worker only after successful HTTP shutdown. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, Redis ping, live `/health`, and `Ctrl+C` shutdown logs showing `shutdown signal received`, `worker stopped`, and `server shutdown`. `net/http` moves to `[~]`; `context` remains `[~]` because this was focused on shutdown timeout use; graceful shutdown moves to `[x]`; timeout handling moves to `[~]`.
 - 2026-07-02 T025 practiced Go concurrency basics by adding a minimal in-process background worker for task-created events. Learner introduced an `internal/worker` package with a `TaskCreatedEvent`, buffered channel, `Start` method that launches a goroutine, and non-blocking `PublishTaskCreated` method using `select` plus a default drop path. Startup now creates the worker, starts it, and passes it into the handler; `RegisterTaskCreateRoutes` publishes an event only after `taskService.Create` succeeds, while preserving the normal `201` HTTP response. Review first found that the worker was created but not started; learner fixed it with `taskWorker.Start()` and cleaned up the unused `Start` parameter. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, and live HTTP checks showing `POST /tasks` returned `201` while logs contained `task created event processed`. `goroutine` and `channel` move to `[~]`; graceful shutdown remains pending for T026.
 - 2026-07-01 T024 practiced a focused Redis-backed business behavior by adding fixed-window login rate limiting. Learner injected the existing Redis client from startup into the router, mounted a `RateLimit` Gin middleware only on `POST /users/login`, used Redis `INCR` for per-IP counters, set a one-minute TTL with `EXPIRE` on first access, handled both increment and expiration errors, and returned the existing unified error envelope with `429 Too Many Requests` when the sixth login attempt occurs within one minute. Review verified the package boundary stayed in `internal/middleware`, router wiring did not disturb authenticated task routes, registration remained outside the rate-limit group, and README documented the login limit. Verification passed `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, and live Redis/runtime checks showing five `401` login failures followed by one `429`, with Redis key `rate_limit:login:127.0.0.1` holding value `6` and TTL `60`. Redis moves to `[x]` for the current Stage 2 scope; rate limiting moves to `[~]` because this is a simple fixed-window implementation and production proxy/IP and atomicity concerns remain future learning areas.
 - 2026-06-30 T023 practiced Redis basics, Docker Compose service setup, configuration management, and external dependency connection boundaries. Learner added a Redis service to `docker-compose.yml`, declared a Redis volume, exposed local port `6379`, added `REDIS_HOST` and `REDIS_PORT` defaults to `internal/config`, and created an `internal/cache` Redis client boundary using `github.com/redis/go-redis/v9`. Startup now pings Redis with a timeout and fails visibly if Redis is unavailable while preserving existing PostgreSQL startup and Gin routes. Initial review found missing README Redis documentation and untidied module metadata; follow-up changes fixed both. Verification passed `docker compose config`, `docker compose exec -T redis redis-cli ping`, PostgreSQL readiness, `go mod tidy -diff`, `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, and a live `/health` check. Redis moves to `[~]` because infrastructure and connection are reviewed, but a practical Redis-backed business use case is still upcoming.
@@ -41,7 +42,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [~] goroutine
 - [~] channel
 - [~] `context`
-- [ ] `net/http`
+- [~] `net/http`
 - [x] Gin
 - [ ] GORM or `sqlc`
 - [x] PostgreSQL
@@ -52,7 +53,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [~] testing
 - [x] logging
 - [x] middleware
-- [ ] graceful shutdown
+- [x] graceful shutdown
 
 ## Python Required Skills
 
@@ -82,7 +83,7 @@ The checklist is not meant to be completed by reading only. A skill should be ma
 - [ ] CI/CD basics
 - [ ] service-to-service communication
 - [~] configuration management
-- [ ] timeout handling
+- [~] timeout handling
 - [ ] retry handling
 - [~] rate limiting
 - [ ] database indexes

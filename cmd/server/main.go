@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"taskapi/internal/auth"
@@ -54,10 +59,7 @@ func run() error {
 	userService := service.NewUserService(userRepo, tokenManager)
 
 	// worker
-	taskWorker := &worker.Worker{
-		Events: make(chan worker.TaskCreatedEvent, 100),
-		Log:    log,
-	}
+	taskWorker := worker.New(log, 100)
 	taskWorker.Start()
 
 	// handler
@@ -71,8 +73,40 @@ func run() error {
 		"database_port", cfg.Database.Port,
 		"database_name", cfg.Database.Name,
 		"jwt_expiration_minutes", cfg.Auth.JWTExpirationMinutes)
-	if err := r.Run(addr); err != nil {
-		return fmt.Errorf("start server on %s: %w", addr, err)
+
+	httpServer := &http.Server{
+		Addr:    addr,
+		Handler: r,
 	}
+	serverErr := make(chan error, 1)
+
+	go func() {
+		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			serverErr <- err
+		}
+	}()
+
+	// 等待 os.Interrupt / syscall.SIGTERM
+	shutdownSignal := make(chan os.Signal, 1)
+	signal.Notify(shutdownSignal, os.Interrupt, syscall.SIGTERM)
+	defer signal.Stop(shutdownSignal)
+
+	select {
+	case err := <-serverErr:
+		return fmt.Errorf("server error: %w", err)
+	case sig := <-shutdownSignal:
+		log.Info("shutdown signal received", "signal", sig.String())
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := httpServer.Shutdown(ctx); err != nil {
+		return fmt.Errorf("shutdown server: %w", err)
+	}
+
+	taskWorker.Stop()
+	log.Info("worker stopped")
+	log.Info("server shutdown")
 	return nil
 }
