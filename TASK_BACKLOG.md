@@ -414,7 +414,7 @@ Skills:
 
 ### T026: Add Graceful Shutdown
 
-Status: `[~]`
+Status: `[x]`
 
 Objective:
 

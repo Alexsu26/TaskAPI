@@ -960,3 +960,46 @@ Evidence:
 - Runtime registration, login, and `POST /tasks` succeeded; task creation returned `201`.
 - Server logs included `task created event processed` with `task_id`, `user_id`, and `title`.
 - Review record: `reviews/2026-07-02-t025-background-worker.md`.
+
+### 2026-07-02: T026 Add Graceful Shutdown
+
+Task:
+
+- Implemented and reviewed graceful shutdown for the Go HTTP server and background worker.
+- Practiced `http.Server`, signal handling, `context.WithTimeout`, and worker lifecycle coordination.
+
+What went well:
+
+- Correctly separated the server goroutine from the main goroutine: `ListenAndServe` runs in the background while the main goroutine waits for either server errors or shutdown signals.
+- Used `signal.Notify` to convert `os.Interrupt` and `SIGTERM` into a channel-driven shutdown path.
+- Used `httpServer.Shutdown(ctx)` with a five-second timeout instead of abruptly exiting the process.
+- Improved the worker lifecycle from "close the event channel" to "close the event channel and wait for the worker goroutine to finish draining queued events."
+- Moved worker internals behind a constructor so `main` no longer initializes the worker's `done` channel directly.
+
+Weak areas:
+
+- The first worker `Stop` implementation closed the event channel but did not wait for the worker goroutine to finish.
+- The first `done` version exposed lifecycle internals as a public field initialized from `main`.
+- The first shutdown structure used `defer taskWorker.Stop()`, which could close the worker channel on a server shutdown timeout while handlers might still be running.
+- A future refinement can handle the rare `ListenAndServe` error path by explicitly stopping the worker before returning.
+
+Next improvement:
+
+- Start Stage 3 with T027: initialize a minimal FastAPI AI service and `/health` endpoint.
+- Keep the first Python service task small before adding persistence, LLM calls, or background execution.
+
+Evidence:
+
+- Replaced `r.Run(addr)` with `http.Server`.
+- Added signal handling for `os.Interrupt` and `SIGTERM`.
+- Added timeout-bound HTTP shutdown with `context.WithTimeout`.
+- Added `worker.New`, private `done`, and `Stop` waiting for worker completion.
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- `docker compose exec -T postgres pg_isready -U taskapi -d taskapi` returned accepting connections.
+- `docker compose exec -T redis redis-cli ping` returned `PONG`.
+- `SERVER_PORT=18080 go run ./cmd/server` started the current source.
+- `curl -i http://127.0.0.1:18080/health` returned `HTTP/1.1 200 OK` and `{"status":"ok"}`.
+- `Ctrl+C` produced shutdown logs: `shutdown signal received`, `worker stopped`, and `server shutdown`.
+- Review record: `reviews/2026-07-02-t026-graceful-shutdown.md`.

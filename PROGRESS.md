@@ -2,15 +2,15 @@
 
 ## Current Stage
 
-Stage 2: Go Engineering
+Stage 3: Python AI Service
 
 ## Current Substage
 
-Graceful Shutdown
+FastAPI Service Initialization
 
 ## Status
 
-T025 completed and verified. Task creation now publishes a small in-process async event to a background worker using `goroutine` and `channel`.
+T026 completed and verified. The Go API now uses `http.Server` with signal-driven graceful shutdown and an explicit background worker stop/drain lifecycle.
 
 ## Completed
 
@@ -45,6 +45,7 @@ T025 completed and verified. Task creation now publishes a small in-process asyn
 - [x] Added Redis to the local development environment
 - [x] Added one Redis-backed use case with login rate limiting
 - [x] Added a small background worker for task-created events
+- [x] Added graceful shutdown for the HTTP server and background worker
 
 ## Current Blockers
 
@@ -52,7 +53,7 @@ None
 
 ## Next Action
 
-Start Task `T026`: add graceful shutdown for the HTTP server and background worker lifecycle.
+Start Task `T027`: initialize the FastAPI AI service with a health check.
 
 ## Last Updated
 

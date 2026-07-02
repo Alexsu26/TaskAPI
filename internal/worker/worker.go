@@ -11,11 +11,20 @@ type TaskCreatedEvent struct {
 type Worker struct {
 	Events chan TaskCreatedEvent
 	Log    *slog.Logger
+	done   chan struct{}
 }
 
-// Graceful shutdown is deferred to T026; this worker currently exits with the process.
+func New(log *slog.Logger, bufferSize int) *Worker {
+	return &Worker{
+		Events: make(chan TaskCreatedEvent, bufferSize),
+		Log:    log,
+		done:   make(chan struct{}),
+	}
+}
+
 func (w *Worker) Start() {
 	go func() {
+		defer close(w.done)
 		for event := range w.Events {
 			w.Log.Info("task created event processed",
 				"task_id", event.TaskID,
@@ -23,6 +32,11 @@ func (w *Worker) Start() {
 				"title", event.Title)
 		}
 	}()
+}
+
+func (w *Worker) Stop() {
+	close(w.Events)
+	<-w.done
 }
 
 func (w *Worker) PublishTaskCreated(event TaskCreatedEvent) {

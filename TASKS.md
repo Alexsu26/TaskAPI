@@ -286,53 +286,66 @@ Summary:
 - Explicitly deferred graceful worker shutdown to T026.
 - Verified `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, and live HTTP behavior: `POST /tasks` returned `201` and the worker logged `task created event processed`.
 
+### T026: Add Graceful Shutdown
+Status: Completed and verified on 2026-07-02.
+
+Summary:
+
+- Replaced `r.Run(addr)` with an explicit `http.Server` so server startup and shutdown are controlled by application code.
+- Started `ListenAndServe` in a goroutine and reported non-`http.ErrServerClosed` errors through a buffered error channel.
+- Added signal handling for `os.Interrupt` and `SIGTERM` with `signal.Notify`.
+- Used `context.WithTimeout` and `httpServer.Shutdown(ctx)` to bound HTTP graceful shutdown.
+- Added a `worker.New` constructor so worker channel setup stays inside the worker package.
+- Added a private worker `done` channel and changed `Stop` to close the event channel, wait for queued events to drain, and return only after the worker goroutine exits.
+- Stopped the worker only after successful HTTP shutdown, avoiding channel closure while HTTP handlers may still publish events.
+- Verified `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, Redis ping, live `/health`, and `Ctrl+C` shutdown logs.
+
 ## Active Task
 
-### T026: Add Graceful Shutdown
+### T027: Initialize FastAPI AI Service
 
 Objective:
 
-Shut down the HTTP server and background worker more cleanly when the process receives an interrupt or termination signal.
+- Create a minimal Python FastAPI service as the starting point for Stage 3.
 
 Recommended first choice:
 
-- replace `r.Run(addr)` with an `http.Server` so shutdown can be controlled
-- listen for `os.Interrupt` / `SIGTERM`
-- use `context.WithTimeout` for bounded shutdown
-- decide how the current worker channel should stop or drain
+- keep the Python service separate from the existing Go service
+- add a small health check endpoint
+- use a simple project structure that can grow into service, repository, and model boundaries later
+- avoid adding AI, database, queue, or auth behavior in this first Python task
 
 Learner should implement:
 
-- start the Gin engine through `http.Server`
-- wait for shutdown signals in startup code
-- call `server.Shutdown(ctx)` with a timeout
-- stop or document the worker lifecycle clearly
-- preserve existing routes, Redis startup, PostgreSQL startup, and worker behavior
+- a minimal FastAPI application
+- a `/health` endpoint returning a simple JSON status
+- basic dependency metadata or run instructions for local startup
+- a clear Python service directory layout
 
 Agent may provide:
 
-- lifecycle and signal-handling explanation
-- small pseudocode for the shutdown flow
-- review and runtime verification commands
+- project layout suggestions
+- FastAPI concept explanations
+- small endpoint examples
+- review and local verification commands
 
 Agent should not:
 
-- introduce Kubernetes, systemd, or deployment-level shutdown yet
-- replace the current worker with a queue framework
-- rewrite unrelated startup code
+- implement AI summary behavior yet
+- add Celery/RQ yet
+- add PostgreSQL persistence yet
+- mix Python service code into the Go internal packages
 
 Acceptance Criteria:
 
-- Server still starts and serves existing routes.
-- `Ctrl+C` or an interrupt signal triggers controlled shutdown logic.
-- HTTP shutdown uses a timeout-bound context.
-- Worker lifecycle behavior is explicit and understandable.
-- Existing tests pass.
-- Runtime shutdown behavior is observable through logs.
+- FastAPI service starts locally.
+- `/health` returns a successful JSON response.
+- Project layout is easy to extend in later Python tasks.
+- Existing Go service files are not disturbed.
+- Run instructions are clear enough to repeat.
 
 Skills Practiced:
 
-- `context`
-- signal handling
-- graceful shutdown
-- lifecycle management
+- FastAPI
+- Python project structure
+- HTTP
