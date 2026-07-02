@@ -14,6 +14,7 @@ import (
 	"taskapi/internal/repository"
 	"taskapi/internal/router"
 	"taskapi/internal/service"
+	"taskapi/internal/worker"
 )
 
 func main() {
@@ -52,8 +53,15 @@ func run() error {
 	userRepo := repository.NewUserRepo(db)
 	userService := service.NewUserService(userRepo, tokenManager)
 
+	// worker
+	taskWorker := &worker.Worker{
+		Events: make(chan worker.TaskCreatedEvent, 100),
+		Log:    log,
+	}
+	taskWorker.Start()
+
 	// handler
-	handler := handler.NewHandler(taskService, userService, log)
+	handler := handler.NewHandler(taskService, userService, log, taskWorker)
 	r := router.SetupRouter(handler, tokenManager, log, redisClient)
 
 	addr := ":" + cfg.Server.Port

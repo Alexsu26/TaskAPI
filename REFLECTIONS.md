@@ -919,3 +919,44 @@ Evidence:
 - The sixth response body was `{"error":{"message":"please try again later"},"status":"error"}`.
 - Redis key `rate_limit:login:127.0.0.1` had value `6` and TTL `60`.
 - Review record: `reviews/2026-07-01-t024-redis-rate-limit.md`.
+
+### 2026-07-02: T025 Add Background Worker Or Async Task
+
+Task:
+
+- Implemented and reviewed a minimal in-process background worker for task-created events.
+- Practiced `goroutine`, buffered `channel`, non-blocking event publication, and runtime log verification.
+
+What went well:
+
+- Kept the async workflow narrow and observable instead of introducing Redis queues, Kafka, email delivery, or a worker framework.
+- Published the task-created event only after `taskService.Create` succeeds, so failed task creation does not produce a misleading async event.
+- Used a buffered channel and non-blocking `select` send so a full worker channel does not block the HTTP success path for long.
+- Started the worker in server startup and passed it into the handler boundary without disturbing existing router, auth, Redis, or database behavior.
+- Verified the behavior through a live `POST /tasks` request and confirmed the worker log line appeared.
+
+Weak areas:
+
+- The first implementation created the worker but did not call `Start`, so events were written into a channel with no consumer.
+- The initial `Start(log *slog.Logger)` signature accepted an unused logger argument, which made ownership less clear.
+- Graceful shutdown is intentionally deferred; the current worker exits with the process and does not yet drain or close its channel.
+
+Next improvement:
+
+- In T026, add graceful shutdown for the HTTP server and make the worker lifecycle explicit.
+- Practice `context.WithTimeout`, signal handling, and shutdown logs without rewriting unrelated startup behavior.
+
+Evidence:
+
+- Added `internal/worker/worker.go`.
+- Updated `cmd/server/main.go` to create and start `taskWorker`.
+- Updated `internal/handler/handler.go` to publish task-created events after successful task creation.
+- `gofmt -l cmd/server internal` produced no output.
+- `go test ./...` passed for all packages.
+- `go vet ./...` succeeded.
+- `docker compose ps` showed PostgreSQL and Redis running.
+- `docker compose exec -T postgres pg_isready -U taskapi -d taskapi` returned accepting connections.
+- `SERVER_PORT=18080 go run ./cmd/server` started the current source.
+- Runtime registration, login, and `POST /tasks` succeeded; task creation returned `201`.
+- Server logs included `task created event processed` with `task_id`, `user_id`, and `title`.
+- Review record: `reviews/2026-07-02-t025-background-worker.md`.

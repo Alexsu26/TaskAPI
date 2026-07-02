@@ -273,53 +273,66 @@ Summary:
 - Updated README with the login rate-limit rule.
 - Verified `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, and live Redis/runtime behavior: five login attempts returned `401`, the sixth returned `429`, and the Redis key had value `6` with TTL `60`.
 
+### T025: Add Background Worker Or Async Task
+Status: Completed and verified on 2026-07-02.
+
+Summary:
+
+- Added a small `internal/worker` package with a `TaskCreatedEvent`, buffered channel, and background goroutine.
+- Started the worker during server startup and injected it into the handler boundary.
+- Published a task-created event only after `taskService.Create` succeeds.
+- Kept the publish path non-blocking with `select` and a default drop path so HTTP task creation is not delayed by a full channel.
+- Logged processed task-created events with structured fields for `task_id`, `user_id`, and `title`.
+- Explicitly deferred graceful worker shutdown to T026.
+- Verified `gofmt -l cmd/server internal`, `go test ./...`, `go vet ./...`, PostgreSQL readiness, and live HTTP behavior: `POST /tasks` returned `201` and the worker logged `task created event processed`.
+
 ## Active Task
 
-### T025: Add Background Worker Or Async Task
+### T026: Add Graceful Shutdown
 
 Objective:
 
-Add a small asynchronous workflow so the project starts practicing Go concurrency before introducing heavier queue or worker infrastructure.
+Shut down the HTTP server and background worker more cleanly when the process receives an interrupt or termination signal.
 
 Recommended first choice:
 
-- a minimal in-process worker using `goroutine` and `channel`
-- keep the workflow observable and easy to verify locally
+- replace `r.Run(addr)` with an `http.Server` so shutdown can be controlled
+- listen for `os.Interrupt` / `SIGTERM`
+- use `context.WithTimeout` for bounded shutdown
+- decide how the current worker channel should stop or drain
 
 Learner should implement:
 
-- choose one narrow async event, such as logging a task-created event or processing a simple notification placeholder
-- define a small event struct and channel ownership boundary
-- start the worker during server startup
-- send the event from the appropriate service or handler boundary without blocking core API behavior for long
-- shut down or document the current shutdown limitation clearly if graceful shutdown is deferred to T026
-- preserve existing task/auth/database behavior
+- start the Gin engine through `http.Server`
+- wait for shutdown signals in startup code
+- call `server.Shutdown(ctx)` with a timeout
+- stop or document the worker lifecycle clearly
+- preserve existing routes, Redis startup, PostgreSQL startup, and worker behavior
 
 Agent may provide:
 
-- concurrency boundary guidance
-- goroutine/channel explanations
-- minimal event design suggestions
-- verification commands
+- lifecycle and signal-handling explanation
+- small pseudocode for the shutdown flow
+- review and runtime verification commands
 
 Agent should not:
 
-- introduce a full message queue yet
-- add a large worker framework
-- rewrite task CRUD flow unnecessarily
+- introduce Kubernetes, systemd, or deployment-level shutdown yet
+- replace the current worker with a queue framework
+- rewrite unrelated startup code
 
 Acceptance Criteria:
 
-- One small async workflow runs locally.
-- The API still responds correctly when the worker is present.
-- Channel ownership and goroutine startup are understandable.
+- Server still starts and serves existing routes.
+- `Ctrl+C` or an interrupt signal triggers controlled shutdown logic.
+- HTTP shutdown uses a timeout-bound context.
+- Worker lifecycle behavior is explicit and understandable.
 - Existing tests pass.
-- Runtime behavior is verifiable through logs or another simple observable result.
-- Any shutdown limitation is documented or explicitly deferred to T026.
+- Runtime shutdown behavior is observable through logs.
 
 Skills Practiced:
 
-- goroutine
-- channel
-- async workflow boundaries
-- runtime verification
+- `context`
+- signal handling
+- graceful shutdown
+- lifecycle management
